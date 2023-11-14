@@ -1,11 +1,12 @@
 {
-  "name": "@akadenia/package",
+  "name": "@akadenia/azure",
   "version": "1.0.0",
-  "description": "Akadenia package: <NAME>",
+  "description": "Akadenia package: Azure",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "keywords": [
-    "<NAME>",
+    "Azure",
+    "BlobStorage",
     "akadenia"
   ],
   "scripts": {
@@ -33,13 +34,16 @@
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@azure/logger": "^1.0.4",
+    "@azure/storage-blob": "^12.17.0"
+  },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
-    "@types/jest": "^29.5.6",
-    "@types/node": "^18.16.1",
+    "@types/jest": "^29.5.8",
+    "@types/node": "^18.18.9",
     "jest": "^29.7.0",
-    "prettier": "^3.0.3",
+    "prettier": "^3.1.0",
     "ts-jest": "^29.1.1",
     "typescript": "^5.2.2"
   }
