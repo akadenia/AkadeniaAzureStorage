@@ -1,6 +1,6 @@
 {
   "name": "@akadenia/azure",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Akadenia package: Azure",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -16,7 +16,7 @@
     "lint": "prettier --check \"./**/*.{ts,tsx,js,jsx,json,yml}\"",
     "prepare": "npm run build",
     "version": "git add -A src",
-    "updateLink": "pm run build && npm rm @akadenia/azure -g && npm link"
+    "updateLink": "npm run build && npm rm @akadenia/azure -g && npm link"
   },
   "files": [
     "dist"
