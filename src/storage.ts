@@ -31,7 +31,7 @@ export interface SASOptions {
  * @class BlobStorage - A class that contains all BlobStorage functionality
  */
 export class BlobStorage {
-  connectionString: string
+  private connectionString: string
 
   constructor(connectionString: string) {
     this.connectionString = connectionString
@@ -115,11 +115,28 @@ export class BlobStorage {
   /**
    * @param {string} containerName - The name of the container to upload to
    * @param {string} blobName - The name of the blob to upload
+   * @param data -  Buffer | Blob | ArrayBuffer | ArrayBufferView
+   * @param bufferSize - Size of every buffer allocated, also the block size in the uploaded block blob. Default value is 8MB
+   * @returns {Promise<boolean>} - A boolean indicating whether or not the blob was successfully uploaded
+   */
+  async uploadData(containerName: string, blobName: string, data: Buffer | Blob | ArrayBuffer | ArrayBufferView) {
+    const blobService = this.getBlobServiceUrl()
+    const container = blobService.getContainerClient(containerName)
+    const blob = container.getBlockBlobClient(blobName)
+
+    const response: BlobUploadCommonResponse = await blob.uploadData(data)
+
+    return response.errorCode === undefined
+  }
+
+  /**
+   * @param {string} containerName - The name of the container to upload to
+   * @param {string} blobName - The name of the blob to upload
    * @param stream - Node.js Readable stream
    * @param bufferSize - Size of every buffer allocated, also the block size in the uploaded block blob. Default value is 8MB
    * @returns {Promise<boolean>} - A boolean indicating whether or not the blob was successfully uploaded
    */
-  async uploadFile(containerName: string, blobName: string, stream: Readable) {
+  async uploadStream(containerName: string, blobName: string, stream: Readable) {
     const blobService = this.getBlobServiceUrl()
     const container = blobService.getContainerClient(containerName)
     const blob = container.getBlockBlobClient(blobName)
