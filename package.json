@@ -36,7 +36,8 @@
   },
   "dependencies": {
     "@azure/logger": "^1.0.4",
-    "@azure/storage-blob": "^12.17.0"
+    "@azure/storage-blob": "^12.17.0",
+    "@azure/storage-queue": "^12.16.0"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
