@@ -4,6 +4,12 @@ export class AzureQueue {
   private queueClient: QueueClient
 
   constructor(connectionString: string, queueName: string) {
+    if (!connectionString) {
+      throw new Error("Missing connection string")
+    }
+    if (!queueName) {
+      throw new Error("Missing queue name")
+    }
     this.queueClient = new QueueClient(connectionString, queueName)
   }
 
