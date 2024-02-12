@@ -28,7 +28,7 @@ export interface SASOptions {
 }
 
 /**
- * @class BlobStorage - A class that contains all BlobStorage functionality
+ * @class BlobStorage - A class that contains azure blob storage helpers
  */
 export class BlobStorage {
   private connectionString: string
@@ -119,7 +119,11 @@ export class BlobStorage {
    * @param bufferSize - Size of every buffer allocated, also the block size in the uploaded block blob. Default value is 8MB
    * @returns {Promise<boolean>} - A boolean indicating whether or not the blob was successfully uploaded
    */
-  async uploadData(containerName: string, blobName: string, data: Buffer | Blob | ArrayBuffer | ArrayBufferView) {
+  async uploadData(
+    containerName: string,
+    blobName: string,
+    data: Buffer | Blob | ArrayBuffer | ArrayBufferView,
+  ): Promise<boolean> {
     const blobService = this.getBlobServiceUrl()
     const container = blobService.getContainerClient(containerName)
     const blob = container.getBlockBlobClient(blobName)
@@ -136,7 +140,7 @@ export class BlobStorage {
    * @param bufferSize - Size of every buffer allocated, also the block size in the uploaded block blob. Default value is 8MB
    * @returns {Promise<boolean>} - A boolean indicating whether or not the blob was successfully uploaded
    */
-  async uploadStream(containerName: string, blobName: string, stream: Readable) {
+  async uploadStream(containerName: string, blobName: string, stream: Readable): Promise<boolean> {
     const blobService = this.getBlobServiceUrl()
     const container = blobService.getContainerClient(containerName)
     const blob = container.getBlockBlobClient(blobName)
