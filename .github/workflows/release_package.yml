@@ -1,7 +1,9 @@
 name: Release Package
 
 on:
-  workflow_dispatch:
+ release:
+    types: [published]
+ workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -26,3 +28,5 @@ jobs:
           scope: "@akadenia"
       - run: npm ci
       - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
