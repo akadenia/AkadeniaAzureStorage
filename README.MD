@@ -1,62 +1,144 @@
 
-## Getting Started
+## Classes
 
-Import the Storage class.
+<dl>
+<dt><a href="#QueueStorage">QueueStorage</a></dt>
+<dd><p>QueueStorage - A class that contains azure queue storage helpers</p>
+</dd>
+<dt><a href="#BlobStorage">BlobStorage</a></dt>
+<dd><p>BlobStorage - A class that contains azure blob storage helpers</p>
+</dd>
+</dl>
 
-`import { BlobStorage } from "@akadenia/azure`
+<a name="QueueStorage"></a>
 
-Create an instance by passing a connection string.
-``
-`const storage = new BlobStorage("your-connection-string")`
+## QueueStorage
+QueueStorage - A class that contains azure queue storage helpers
 
-Access the available methods on your instance.
+**Kind**: global class
 
-## `storage.blobExists(containerName, blobName)`
+* [QueueStorage](#QueueStorage)
+    * [.getQueueClient()](#QueueStorage+getQueueClient) ⇒ <code>QueueClient</code>
+    * [.sendMessage(message)](#QueueStorage+sendMessage) ⇒ <code>Promise.&lt;any&gt;</code>
 
-Returns a boolean value that indicates whether or not a blob exists.
+<a name="QueueStorage+getQueueClient"></a>
 
-Arguments
-|Name|Type|Required|Description|
-|--|--|--|--|
-|`containerName`|`string`|`true`|The container to check for the blob|
-|`blobName`|`string` |`true`|The name of the blob to check for|
+### queueStorage.getQueueClient() ⇒ <code>QueueClient</code>
+**Kind**: instance method of [<code>QueueStorage</code>](#QueueStorage)
+**Returns**: <code>QueueClient</code> - - A QueueClient object
+<a name="QueueStorage+sendMessage"></a>
 
-## `storage.getBlobServiceUrl()`
+### queueStorage.sendMessage(message) ⇒ <code>Promise.&lt;any&gt;</code>
+**Kind**: instance method of [<code>QueueStorage</code>](#QueueStorage)
+**Returns**: <code>Promise.&lt;any&gt;</code> - - The response from the queue
 
-Returns a blob service client object with Azure `BlobServiceClient` methods available.
+| Param | Type | Description |
+| --- | --- | --- |
+| message | <code>string</code> | The message to send |
 
-Arguments
-|Name|Type|Required|Description|
-|--|--|--|--|
+<a name="BlobStorage"></a>
 
-## `storage.listBlobs(containerName, blobNamePrefix)`
+## BlobStorage
+BlobStorage - A class that contains azure blob storage helpers
 
-Returns an array of `BlobItem` objects.
+**Kind**: global class
 
-Arguments
-|Name|Type|Required|Description|
-|--|--|--|--|
-|`containerName`|`string`|`true`|The container to check for the blob|
-|`blobNamePrefix`|`string` |`true`|The blob name prefixes to check for a match|
+* [BlobStorage](#BlobStorage)
+    * [.getBlobServiceUrl()](#BlobStorage+getBlobServiceUrl) ⇒ <code>BlobServiceClient</code>
+    * [.listBlobs(containerName, blobNamePrefix)](#BlobStorage+listBlobs) ⇒ <code>Promise.&lt;Array.&lt;BlobItem&gt;&gt;</code>
+    * [.downloadBlob(containerName, blobName)](#BlobStorage+downloadBlob) ⇒ <code>Promise.&lt;Buffer&gt;</code>
+    * [.blobExists(containerName, blobName)](#BlobStorage+blobExists) ⇒ <code>Promise.&lt;boolean&gt;</code>
+    * [.upload(containerName, blobName, body, contentLength, contentType)](#BlobStorage+upload) ⇒ <code>Promise.&lt;boolean&gt;</code>
+    * [.uploadData(containerName, blobName, data, bufferSize)](#BlobStorage+uploadData) ⇒ <code>Promise.&lt;boolean&gt;</code>
+    * [.uploadStream(containerName, blobName, stream, bufferSize)](#BlobStorage+uploadStream) ⇒ <code>Promise.&lt;boolean&gt;</code>
+    * [.generateSASUrl(containerName, blobName, sasOptions)](#BlobStorage+generateSASUrl) ⇒ <code>string</code>
 
-## `storage.downloadBlob(containerName, blobName)`
+<a name="BlobStorage+getBlobServiceUrl"></a>
 
-Returns a `Buffer` object.
+### blobStorage.getBlobServiceUrl() ⇒ <code>BlobServiceClient</code>
+**Kind**: instance method of [<code>BlobStorage</code>](#BlobStorage)
+**Returns**: <code>BlobServiceClient</code> - - A BlobServiceClient object
+<a name="BlobStorage+listBlobs"></a>
 
-Arguments
-|Name|Type|Required|Description|
-|--|--|--|--|
-|`containerName`|`string`|`true`|The container to check for the blob|
-|`blobName`|`string` |`true`|The name of the blob to download|
+### blobStorage.listBlobs(containerName, blobNamePrefix) ⇒ <code>Promise.&lt;Array.&lt;BlobItem&gt;&gt;</code>
+**Kind**: instance method of [<code>BlobStorage</code>](#BlobStorage)
+**Returns**: <code>Promise.&lt;Array.&lt;BlobItem&gt;&gt;</code> - - An array of BlobItem objects
 
-## `storage.upload(containerName, blobName, body, type)`
+| Param | Type | Description |
+| --- | --- | --- |
+| containerName | <code>string</code> | The name of the container to check |
+| blobNamePrefix | <code>string</code> | The prefix of the blob name |
 
-Returns a `boolean` indicating whether or not the blob was successfully uploaded.
+<a name="BlobStorage+downloadBlob"></a>
 
-Arguments
-|Name|Type|Required|Description|
-|--|--|--|--|
-|`containerName`|`string`|`true`|The container to upload the blob to|
-|`blobName`|`string` |`true`|The name of the blob to upload|
-|`body`|`string` or `ArrayBuffer` |`true`|The body of the blob being uploaded|
-|`type`|`string` |`true`|The type of the blob|
+### blobStorage.downloadBlob(containerName, blobName) ⇒ <code>Promise.&lt;Buffer&gt;</code>
+**Kind**: instance method of [<code>BlobStorage</code>](#BlobStorage)
+**Returns**: <code>Promise.&lt;Buffer&gt;</code> - - A Buffer object
+
+| Param | Type | Description |
+| --- | --- | --- |
+| containerName | <code>string</code> | The name of the container to download from |
+| blobName | <code>string</code> | The name of the blob to download |
+
+<a name="BlobStorage+blobExists"></a>
+
+### blobStorage.blobExists(containerName, blobName) ⇒ <code>Promise.&lt;boolean&gt;</code>
+**Kind**: instance method of [<code>BlobStorage</code>](#BlobStorage)
+**Returns**: <code>Promise.&lt;boolean&gt;</code> - - A boolean indicating whether or not the blob exists
+
+| Param | Type | Description |
+| --- | --- | --- |
+| containerName | <code>string</code> | The name of the container to check |
+| blobName | <code>string</code> | The name of the blob to check |
+
+<a name="BlobStorage+upload"></a>
+
+### blobStorage.upload(containerName, blobName, body, contentLength, contentType) ⇒ <code>Promise.&lt;boolean&gt;</code>
+**Kind**: instance method of [<code>BlobStorage</code>](#BlobStorage)
+**Returns**: <code>Promise.&lt;boolean&gt;</code> - - A boolean indicating whether or not the blob was successfully uploaded
+
+| Param | Type | Description |
+| --- | --- | --- |
+| containerName | <code>string</code> | The name of the container to upload to |
+| blobName | <code>string</code> | The name of the blob to upload |
+| body | <code>HttpRequestBody</code> | The body of the blob |
+| contentLength | <code>string</code> | The content length |
+| contentType | <code>string</code> | The content type of the blob |
+
+<a name="BlobStorage+uploadData"></a>
+
+### blobStorage.uploadData(containerName, blobName, data, bufferSize) ⇒ <code>Promise.&lt;boolean&gt;</code>
+**Kind**: instance method of [<code>BlobStorage</code>](#BlobStorage)
+**Returns**: <code>Promise.&lt;boolean&gt;</code> - - A boolean indicating whether or not the blob was successfully uploaded
+
+| Param | Type | Description |
+| --- | --- | --- |
+| containerName | <code>string</code> | The name of the container to upload to |
+| blobName | <code>string</code> | The name of the blob to upload |
+| data |  | Buffer | Blob | ArrayBuffer | ArrayBufferView |
+| bufferSize |  | Size of every buffer allocated, also the block size in the uploaded block blob. Default value is 8MB |
+
+<a name="BlobStorage+uploadStream"></a>
+
+### blobStorage.uploadStream(containerName, blobName, stream, bufferSize) ⇒ <code>Promise.&lt;boolean&gt;</code>
+**Kind**: instance method of [<code>BlobStorage</code>](#BlobStorage)
+**Returns**: <code>Promise.&lt;boolean&gt;</code> - - A boolean indicating whether or not the blob was successfully uploaded
+
+| Param | Type | Description |
+| --- | --- | --- |
+| containerName | <code>string</code> | The name of the container to upload to |
+| blobName | <code>string</code> | The name of the blob to upload |
+| stream |  | Node.js Readable stream |
+| bufferSize |  | Size of every buffer allocated, also the block size in the uploaded block blob. Default value is 8MB |
+
+<a name="BlobStorage+generateSASUrl"></a>
+
+### blobStorage.generateSASUrl(containerName, blobName, sasOptions) ⇒ <code>string</code>
+**Kind**: instance method of [<code>BlobStorage</code>](#BlobStorage)
+**Returns**: <code>string</code> - -The URL for the blob.
+
+| Param | Type | Description |
+| --- | --- | --- |
+| containerName | <code>string</code> | The name of the blob container. |
+| blobName | <code>string</code> | The name of the blob. |
+| sasOptions | <code>SASOptions</code> | The options used for generating the SAS query. |
