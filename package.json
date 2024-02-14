@@ -1,12 +1,13 @@
 {
   "name": "@akadenia/azure",
-  "version": "1.2.0",
-  "description": "Akadenia package: Azure",
+  "version": "1.2.1",
+  "description": "Azure storage utility methods",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "keywords": [
     "Azure",
     "BlobStorage",
+    "QueueStorage",
     "akadenia"
   ],
   "scripts": {
@@ -24,16 +25,16 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/akadenia/AkadeniaPackage.git"
+    "url": "git+https://github.com/akadenia/AkadeniaAzure.git"
   },
   "author": "Akadenia",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/akadenia/AkadeniaPackage/issues"
+    "url": "https://github.com/akadenia/AkadeniaAzure/issues"
   },
-  "homepage": "https://github.com/akadenia/AkadeniaPackage#readme",
+  "homepage": "https://github.com/akadenia/AkadeniaAzure#readme",
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
     "@azure/logger": "^1.0.4",
