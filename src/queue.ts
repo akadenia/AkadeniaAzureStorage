@@ -1,6 +1,9 @@
 import { QueueClient } from "@azure/storage-queue"
 
-export class AzureQueue {
+/**
+ * @class QueueStorage - A class that contains azure queue storage helpers
+ */
+export class QueueStorage {
   private queueClient: QueueClient
 
   constructor(connectionString: string, queueName: string) {
