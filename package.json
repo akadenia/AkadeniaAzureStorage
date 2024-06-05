@@ -15,7 +15,7 @@
     "test": "jest",
     "format": "prettier --write \"./**/*.{ts,tsx,js,jsx,json,yml}\"",
     "lint": "prettier --check \"./**/*.{ts,tsx,js,jsx,json,yml}\"",
-    "prepare": "npm run build",
+    "prepare": "husky",
     "version": "git add -A src",
     "updateLink": "npm run build && npm rm @akadenia/azure -g && npm link",
     "generate:docs": "jsdoc2md dist/*.js"
@@ -37,17 +37,23 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
-    "@azure/logger": "^1.0.4",
-    "@azure/storage-blob": "^12.17.0",
-    "@azure/storage-queue": "^12.16.0"
+    "@azure/logger": "^1.1.2",
+    "@azure/storage-blob": "^12.23.0",
+    "@azure/storage-queue": "^12.17.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^18.6.1",
+    "@commitlint/config-conventional": "^18.6.2",
     "@jest/globals": "^29.7.0",
-    "@types/node": "^18.18.9",
+    "@types/node": "^20.14.1",
     "jest": "^29.7.0",
     "jsdoc-to-markdown": "^8.0.1",
-    "prettier": "^3.1.0",
-    "ts-jest": "^29.1.1",
-    "typescript": "^5.2.2"
+    "prettier": "^3.3.0",
+    "ts-jest": "^29.1.4",
+    "typescript": "^5.4.5",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "husky": "^9.0.11",
+    "semantic-release": "22.0.12"
   }
 }
