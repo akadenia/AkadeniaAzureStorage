@@ -34,6 +34,9 @@ jobs:
         run: npm clean-install
 
       - uses: codfish/semantic-release-action@v3
+        id: semantic
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - run: echo ${{ steps.semantic.outputs.release-version }}
