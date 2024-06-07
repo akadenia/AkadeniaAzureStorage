@@ -8,12 +8,12 @@ module.exports = {
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
     "@semantic-release/changelog",
+    "@semantic-release/npm",
     [
-      "@semantic-release/npm",
+      "@semantic-release/exec",
       {
-        pkgRoot: "dist",
+        successCmd: "chmod u+x ./scripts/commit-release-assets.sh && ./scripts/commit-release-assets.sh ${nextRelease.version}",
       },
     ],
-    "@semantic-release/git",
   ],
 }
