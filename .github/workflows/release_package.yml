@@ -1,7 +1,10 @@
 name: Release Package
 
 on:
-  push:
+  workflow_run:
+    workflows: ["Build, Lint, Test"]
+    types:
+      - completed
     branches:
       - main
   workflow_dispatch:
@@ -17,6 +20,7 @@ concurrency:
 jobs:
   release:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     permissions:
       contents: write
       packages: write
