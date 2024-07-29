@@ -26,7 +26,7 @@ git checkout -b $BRANCH_NAME
 
 # Commit changes
 git add package.json package-lock.json CHANGELOG.md
-git commit -m "add release assets from $VERSION"
+git commit -m "chore(release): add release assets from $VERSION"
 
 # Push branch to the remote
 git push origin $BRANCH_NAME

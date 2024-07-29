@@ -15,7 +15,7 @@
     "test": "jest",
     "format": "prettier --write \"./**/*.{ts,tsx,js,jsx,json,yml}\"",
     "lint": "prettier --check \"./**/*.{ts,tsx,js,jsx,json,yml}\"",
-    "prepare": "npm run build",
+    "prepare": "husky",
     "version": "git add -A src",
     "updateLink": "npm run build && npm rm @akadenia/azure -g && npm link",
     "generate:docs": "jsdoc2md dist/*.js"
