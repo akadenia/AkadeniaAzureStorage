@@ -1,3 +1,1 @@
 ### Short Summary
-
-### Screenshots
