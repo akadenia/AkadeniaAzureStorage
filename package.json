@@ -37,6 +37,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
+    "@azure/data-tables": "^13.2.2",
     "@azure/logger": "^1.1.4",
     "@azure/storage-blob": "^12.24.0",
     "@azure/storage-queue": "^12.23.0"
