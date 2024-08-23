@@ -5,10 +5,7 @@ import {
   ListTableEntitiesOptions,
   TableClient,
   TableEntity,
-  TableEntityResult,
-  TableEntityResultPage,
-  UpdateEntityResponse,
-  UpsertEntityResponse,
+  TableEntityResult
 } from "@azure/data-tables"
 
 /**
@@ -46,8 +43,7 @@ export class TableStorage {
       throw new Error("Missing table name")
     }
 
-    this.tableClient = new TableClient(connectionString, tableName)
-    this.createTable()
+    this.tableClient = TableClient.fromConnectionString(connectionString, tableName)
   }
 
   /**
