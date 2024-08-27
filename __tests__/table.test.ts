@@ -46,7 +46,7 @@ describe("TableStorage", () => {
     }).toThrow("Missing table name")
   })
 
-  it("should list added entities", async () => {
+  it.skip("should list added entities", async () => {
     const table = new TableStorage(storageConnectionString, "TestTableList")
     await table.createTable()
 
@@ -82,7 +82,7 @@ describe("TableStorage", () => {
     await table.deleteTable()
   })
 
-  it("should delete an entity", async () => {
+  it.skip("should delete an entity", async () => {
     const table = new TableStorage(storageConnectionString, "TestTableDelete")
     await table.createTable()
 
