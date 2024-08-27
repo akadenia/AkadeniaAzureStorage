@@ -6,7 +6,6 @@ afterEach(() => {
   jest.clearAllMocks()
 })
 
-
 const storageConnectionString = "UseDevelopmentStorage=true"
 
 describe("TableStorage", () => {
@@ -33,7 +32,7 @@ describe("TableStorage", () => {
       age: 30,
     }
 
-    const result = await table.insertEntity(entity)
+    const result = await table.insert(entity)
 
     expect(result).toBe(true)
   })
@@ -49,5 +48,59 @@ describe("TableStorage", () => {
     expect(() => {
       new TableStorage(storageConnectionString, "")
     }).toThrow("Missing table name")
+  })
+
+  it("should list added entities", async () => {
+    const table = new TableStorage(storageConnectionString, "TestTable")
+    await table.createTable()
+
+    const entity1 = {
+      partitionKey: "p1",
+      rowKey: "1",
+      name: "name1",
+      age: 20,
+    }
+
+    const entity2 = {
+      partitionKey: "p1",
+      rowKey: "2",
+      name: "name2",
+      age: 30,
+    }
+
+    await table.insert(entity1)
+    await table.insert(entity2)
+
+    const entities = await table.list()
+
+    expect(entities).toBeDefined()
+    expect(entities.length).toBeGreaterThan(0)
+    expect(entities[0].partitionKey).toBe(entity1.partitionKey)
+
+    table.deleteTable()
+  })
+
+  it("should delete an entity", async () => {
+    const table = new TableStorage(storageConnectionString, "TestTable")
+    await table.createTable()
+
+    const entity = {
+      partitionKey: "p1",
+      rowKey: "1",
+      name: "name1",
+      age: 20,
+    }
+
+    await table.insert(entity)
+    const result = await table.delete(entity.partitionKey, entity.rowKey)
+
+    expect(result).toBe(true)
+
+    const entities = await table.list()
+
+    expect(entities).toBeDefined()
+    expect(entities.length).toBe(0)
+
+    table.deleteTable()
   })
 })
