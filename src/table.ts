@@ -1,12 +1,4 @@
-import {
-  CreateTableEntityResponse,
-  DeleteTableEntityResponse,
-  GetTableEntityResponse,
-  ListTableEntitiesOptions,
-  TableClient,
-  TableEntity,
-  TableEntityResult
-} from "@azure/data-tables"
+import { GetTableEntityResponse, ListTableEntitiesOptions, TableClient, TableEntity, TableEntityResult } from "@azure/data-tables"
 
 /**
  * @interface ITableEntity - An interface that represents an entity in an azure table
@@ -85,7 +77,7 @@ export class TableStorage {
    * @param {ITableEntity} entity - The entity to insert
    * @returns {Promise<boolean>} - A promise that resolves to true if the entity was inserted
    */
-  async insertEntity(entity: ITableEntity): Promise<boolean> {
+  async insert(entity: ITableEntity): Promise<boolean> {
     try {
       this.tableClient.createEntity(entity)
     } catch (error) {
@@ -99,7 +91,7 @@ export class TableStorage {
    * @param {ITableEntity} entity - The entity to update
    * @returns {Promise<boolean>} - A promise that resolves to true if the entity was updated
    */
-  async updateEntity(entity: ITableEntity): Promise<boolean> {
+  async update(entity: ITableEntity): Promise<boolean> {
     try {
       this.tableClient.updateEntity(entity)
     } catch (error) {
@@ -113,7 +105,7 @@ export class TableStorage {
    * @param {ITableEntity} entity - The entity to upsert
    * @returns {Promise<boolean>} - A promise that resolves to true if the entity was upserted
    */
-  async upsertEntity(entity: ITableEntity): Promise<boolean> {
+  async upsert(entity: ITableEntity): Promise<boolean> {
     try {
       this.tableClient.upsertEntity(entity)
     } catch (error) {
@@ -128,7 +120,7 @@ export class TableStorage {
    * @param {string} rowKey - The row key
    * @returns {Promise<ITableEntity>} - The deleted entity
    */
-  async deleteEntity(partitionKey: string, rowKey: string): Promise<boolean> {
+  async delete(partitionKey: string, rowKey: string): Promise<boolean> {
     try {
       this.tableClient.deleteEntity(partitionKey, rowKey)
     } catch (error) {
@@ -143,13 +135,21 @@ export class TableStorage {
    * @param {string} rowKey - The row key
    * @returns {Promise<ITableEntity>} - The retrieved entity
    */
-  async getEntity(partitionKey: string, rowKey: string): Promise<GetTableEntityResponse<TableEntityResult<ITableEntity>>> {
+  async get(partitionKey: string, rowKey: string): Promise<GetTableEntityResponse<TableEntityResult<ITableEntity>>> {
     return this.tableClient.getEntity(partitionKey, rowKey)
   }
 
-  async listEntities(options?: ListTableEntitiesOptions): Promise<ITableEntity[]> {
-    const entities = this.tableClient.listEntities(options)
+  async list<T extends ITableEntity>(options?: ListTableEntitiesOptions): Promise<T[]> {
+    const iterator = this.tableClient.listEntities<T>(options)
+    let entities = []
+    let i = 1
+    for await (const entity of iterator) {
+      entities.push(entity)
 
-    return []
+      this
+      i++
+    }
+
+    return entities
   }
 }
