@@ -2,10 +2,6 @@ import { jest, describe, expect, it, afterEach } from "@jest/globals"
 
 import { TableStorage } from "../src/table"
 
-afterEach(() => {
-  jest.clearAllMocks()
-})
-
 const storageConnectionString = "UseDevelopmentStorage=true"
 
 describe("TableStorage", () => {
@@ -24,7 +20,7 @@ describe("TableStorage", () => {
   })
 
   it("should insert an entity", async () => {
-    const table = new TableStorage(storageConnectionString, "TestTable")
+    const table = new TableStorage(storageConnectionString, "TestTableInsert")
     const entity = {
       partitionKey: "partitionKey",
       rowKey: "rowKey",
@@ -38,7 +34,7 @@ describe("TableStorage", () => {
   })
 
   it("should get a TableClient object", () => {
-    const table = new TableStorage(storageConnectionString, "tableName")
+    const table = new TableStorage(storageConnectionString, "TestTableGet")
     const tableClient = table.getTableClient()
 
     expect(tableClient).toBeDefined()
@@ -51,7 +47,7 @@ describe("TableStorage", () => {
   })
 
   it("should list added entities", async () => {
-    const table = new TableStorage(storageConnectionString, "TestTable")
+    const table = new TableStorage(storageConnectionString, "TestTableList")
     await table.createTable()
 
     const entity1 = {
@@ -77,11 +73,11 @@ describe("TableStorage", () => {
     expect(entities.length).toBeGreaterThan(0)
     expect(entities[0].partitionKey).toBe(entity1.partitionKey)
 
-    table.deleteTable()
+    await table.deleteTable()
   })
 
   it("should delete an entity", async () => {
-    const table = new TableStorage(storageConnectionString, "TestTable")
+    const table = new TableStorage(storageConnectionString, "TestTableDelete")
     await table.createTable()
 
     const entity = {
@@ -101,6 +97,6 @@ describe("TableStorage", () => {
     expect(entities).toBeDefined()
     expect(entities.length).toBe(0)
 
-    table.deleteTable()
+    await table.deleteTable()
   })
 })
