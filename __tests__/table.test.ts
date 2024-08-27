@@ -1,4 +1,4 @@
-import { jest, describe, expect, it, afterEach } from "@jest/globals"
+import { describe, expect, it, jest } from "@jest/globals"
 
 import { TableStorage } from "../src/table"
 
@@ -50,6 +50,8 @@ describe("TableStorage", () => {
     const table = new TableStorage(storageConnectionString, "TestTableList")
     await table.createTable()
 
+    jest.setTimeout(1000)
+
     const entity1 = {
       partitionKey: "p1",
       rowKey: "1",
@@ -67,11 +69,15 @@ describe("TableStorage", () => {
     await table.insert(entity1)
     await table.insert(entity2)
 
+    jest.setTimeout(500)
+
     const entities = await table.list()
 
     expect(entities).toBeDefined()
     expect(entities.length).toBeGreaterThan(0)
     expect(entities[0].partitionKey).toBe(entity1.partitionKey)
+
+    jest.setTimeout(500)
 
     await table.deleteTable()
   })
@@ -92,10 +98,14 @@ describe("TableStorage", () => {
 
     expect(result).toBe(true)
 
+    jest.setTimeout(1000)
+
     const entities = await table.list()
 
     expect(entities).toBeDefined()
     expect(entities.length).toBe(0)
+
+    jest.setTimeout(500)
 
     await table.deleteTable()
   })
