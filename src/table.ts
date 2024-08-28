@@ -1,10 +1,4 @@
-import {
-  GetTableEntityResponse,
-  ListTableEntitiesOptions,
-  TableClient,
-  TableEntity,
-  TableEntityResult,
-} from "@azure/data-tables"
+import { GetTableEntityResponse, ListTableEntitiesOptions, TableClient, TableEntity, TableEntityResult } from "@azure/data-tables"
 
 /**
  * @interface ITableEntity - An interface that represents an entity in an azure table
