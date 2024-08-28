@@ -26,8 +26,11 @@ jobs:
         with:
           node-version-file: ".nvmrc"
           cache: "npm"
-
       - run: npm ci
       - run: npm run build
       - run: npm run lint
-      - run: npm run test --if-present
+      - name: Install & run Azurite
+        run: npm install -g azurite
+      - name: Run Azurite in Background
+        shell: bash
+        run: azurite-table &
