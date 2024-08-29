@@ -1,6 +1,6 @@
 {
   "name": "@akadenia/azure-storage",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Azure storage utility methods",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -18,7 +18,7 @@
     "lint": "prettier --check \"./**/*.{ts,tsx,js,jsx,json,yml}\"",
     "prepare": "husky",
     "version": "git add -A src",
-    "updateLink": "npm run build && npm rm @akadenia/azure -g && npm link",
+    "updateLink": "npm run build && npm rm @akadenia/azure-storage -g && npm link",
     "generate:docs": "ts-node generate-docs.ts"
   },
   "files": [
