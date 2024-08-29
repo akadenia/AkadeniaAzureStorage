@@ -16,7 +16,7 @@ import { GetTableEntityResponse, ListTableEntitiesOptions, TableClient, TableEnt
     The partition key and row key may be a string value up to 1024 characters in size.
  */
 export interface ITableEntity extends TableEntity {
-  readonly Timestamp?: Date
+  readonly timestamp?: Date
   [key: string]: any
 }
 
