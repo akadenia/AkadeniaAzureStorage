@@ -214,5 +214,5 @@ Deletes a table in the storage account
 
 
 ## License
-[MIT](https://github.com/akadenia/AkadeniaAzure/blob/main/LICENSE)
+[MIT](https://github.com/akadenia/AkadeniaAzureStorage/blob/main/LICENSE)
 
