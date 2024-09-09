@@ -1,7 +1,7 @@
 
 ## Installation
 ```
-npm install @akadenia/azure --save
+npm install @akadenia/azure-storage --save
 ```
 
 ## BlobStorage
