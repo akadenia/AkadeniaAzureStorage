@@ -12,49 +12,56 @@ BlobStorage - A class that contains azure blob storage helpers
 **Kind**: global class  
 
 * BlobStorage
-    * .getBlobServiceUrl() ⇒ `BlobServiceClient`
-    * .listBlobs(containerName, blobNamePrefix) ⇒ `Promise<Array<BlobItem>>`
-    * .downloadBlob(containerName, blobName) ⇒ `Promise<Buffer>`
-    * .blobExists(containerName, blobName) ⇒ `Promise<boolean>`
+    * .getBlobServiceUrl(sasUrl: optional) ⇒ `BlobServiceClient`
+    * .listBlobs(containerName, blobNamePrefix, sasUrl: optional) ⇒ `Promise<Array<BlobItem>>`
+    * .downloadBlob(containerName, blobName, sasUrl: optional) ⇒ `Promise<Buffer>`
+    * .blobExists(containerName, blobName, sasUrl: optional) ⇒ `Promise<boolean>`
     * .upload(containerName, blobName, body, contentLength, contentType) ⇒ `Promise<boolean>`
-    * .uploadData(containerName, blobName, data, bufferSize) ⇒ `Promise<boolean>`
-    * .uploadStream(containerName, blobName, stream, bufferSize) ⇒ `Promise<boolean>`
+    * .uploadData(containerName, blobName, data, sasUrl: optional, bufferSize) ⇒ `Promise<boolean>`
+    * .uploadStream(containerName, blobName, stream, sasUrl: optional, bufferSize) ⇒ `Promise<boolean>`
     * .generateSASUrl(containerName, blobName, sasOptions) ⇒ `string`
 
 
 
-### getBlobServiceUrl()
+### getBlobServiceUrl(sasUrl: optional)
 **Kind**: instance method of `BlobStorage`  
 **Returns**: `BlobServiceClient` - - A BlobServiceClient object  
+**Params**
+
+- sasUrl: optional `string` - Will construct the blob service client using the sas url if exists, the connection string otherwise
 
 
-### listBlobs(containerName, blobNamePrefix)
+
+### listBlobs(containerName, blobNamePrefix, sasUrl: optional)
 **Kind**: instance method of `BlobStorage`  
 **Returns**: `Promise<Array<BlobItem>>` - - An array of BlobItem objects  
 **Params**
 
 - containerName `string` - The name of the container to check
 - blobNamePrefix `string` - The prefix of the blob name
+- sasUrl: optional `string` - Will construct the blob service client using the sas url if exists, the connection string otherwise
 
 
 
-### downloadBlob(containerName, blobName)
+### downloadBlob(containerName, blobName, sasUrl: optional)
 **Kind**: instance method of `BlobStorage`  
 **Returns**: `Promise<Buffer>` - - A Buffer object  
 **Params**
 
 - containerName `string` - The name of the container to download from
 - blobName `string` - The name of the blob to download
+- sasUrl: optional `string` - Will construct the blob service client using the sas url if exists, the connection string otherwise
 
 
 
-### blobExists(containerName, blobName)
+### blobExists(containerName, blobName, sasUrl: optional)
 **Kind**: instance method of `BlobStorage`  
 **Returns**: `Promise<boolean>` - - A boolean indicating whether or not the blob exists  
 **Params**
 
 - containerName `string` - The name of the container to check
 - blobName `string` - The name of the blob to check
+- sasUrl: optional `string` - Will construct the blob service client using the sas url if exists, the connection string otherwise
 
 
 
@@ -71,7 +78,7 @@ BlobStorage - A class that contains azure blob storage helpers
 
 
 
-### uploadData(containerName, blobName, data, bufferSize)
+### uploadData(containerName, blobName, data, sasUrl: optional, bufferSize)
 **Kind**: instance method of `BlobStorage`  
 **Returns**: `Promise<boolean>` - - A boolean indicating whether or not the blob was successfully uploaded  
 **Params**
@@ -79,11 +86,12 @@ BlobStorage - A class that contains azure blob storage helpers
 - containerName `string` - The name of the container to upload to
 - blobName `string` - The name of the blob to upload
 - data - Buffer | Blob | ArrayBuffer | ArrayBufferView
+- sasUrl: optional `string` - Will construct the blob service client using the sas url if exists, the connection string otherwise
 - bufferSize - Size of every buffer allocated, also the block size in the uploaded block blob. Default value is 8MB
 
 
 
-### uploadStream(containerName, blobName, stream, bufferSize)
+### uploadStream(containerName, blobName, stream, sasUrl: optional, bufferSize)
 **Kind**: instance method of `BlobStorage`  
 **Returns**: `Promise<boolean>` - - A boolean indicating whether or not the blob was successfully uploaded  
 **Params**
@@ -91,6 +99,7 @@ BlobStorage - A class that contains azure blob storage helpers
 - containerName `string` - The name of the container to upload to
 - blobName `string` - The name of the blob to upload
 - stream - Node.js Readable stream
+- sasUrl: optional `string` - Will construct the blob service client using the sas url if exists, the connection string otherwise
 - bufferSize - Size of every buffer allocated, also the block size in the uploaded block blob. Default value is 8MB
 
 
@@ -214,5 +223,5 @@ Deletes a table in the storage account
 
 
 ## License
-[MIT](https://github.com/akadenia/AkadeniaAzure/blob/main/LICENSE)
+MIT: optional(https://github.com/akadenia/AkadeniaAzureStorage/blob/main/LICENSE)
 
