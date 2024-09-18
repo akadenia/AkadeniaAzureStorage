@@ -30,7 +30,7 @@ async function main() {
   // Replace any links with the the normal text
   docsString = docsString.replace(/\[(.*?)\]\(#.*?\)/g, "$1")
   // Replace the optional params with more human readable ones
-  docsString = docsString.replace(/\[(\w+)\]/g, '$1: optional');
+  docsString = docsString.replace(/\[(\w+)\]/g, "$1: optional")
   fs.writeFile("./README.md", docsString, () => {})
 }
 
