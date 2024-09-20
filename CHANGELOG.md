@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/akadenia/AkadeniaAzureStorage/compare/1.3.1...1.4.0) (2024-09-20)
+
+
+### Features
+
+* **blob-storage:** add support for sas url ([#20](https://github.com/akadenia/AkadeniaAzureStorage/issues/20)) ([4c5b0bd](https://github.com/akadenia/AkadeniaAzureStorage/commit/4c5b0bde8277e594f027850e16eeec9f66f05735))
+
 # [1.3.0](https://github.com/akadenia/AkadeniaAzureStorage/compare/1.2.4...1.3.0) (2024-08-29)
 
 
