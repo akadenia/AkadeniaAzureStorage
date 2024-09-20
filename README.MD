@@ -1,10 +1,8 @@
 
 ## Installation
 ```
-npm install @akadenia/azure --save
+npm install @akadenia/azure-storage --save
 ```
-
-
 
 ## BlobStorage
 BlobStorage - A class that contains azure blob storage helpers
@@ -156,7 +154,6 @@ TableStorage - A class that contains azure table storage helpers
     * .get(partitionKey, rowKey) ⇒ `Promise<ITableEntity>`
 
 
-
 ### getTableClient()
 **Kind**: instance method of `TableStorage`  
 **Returns**: `TableClient` - - A TableClient object  
@@ -184,14 +181,12 @@ Deletes a table in the storage account
 - entity `ITableEntity` - The entity to insert
 
 
-
 ### update(entity)
 **Kind**: instance method of `TableStorage`  
 **Returns**: `Promise<boolean>` - - A promise that resolves to true if the entity was updated  
 **Params**
 
 - entity `ITableEntity` - The entity to update
-
 
 
 ### upsert(entity)
@@ -202,7 +197,6 @@ Deletes a table in the storage account
 - entity `ITableEntity` - The entity to upsert
 
 
-
 ### delete(partitionKey, rowKey)
 **Kind**: instance method of `TableStorage`  
 **Returns**: `Promise<ITableEntity>` - - The deleted entity  
@@ -210,7 +204,6 @@ Deletes a table in the storage account
 
 - partitionKey `string` - The partition key
 - rowKey `string` - The row key
-
 
 
 ### get(partitionKey, rowKey)
@@ -223,5 +216,5 @@ Deletes a table in the storage account
 
 
 ## License
-MIT: optional(https://github.com/akadenia/AkadeniaAzureStorage/blob/main/LICENSE)
+[MIT](https://github.com/akadenia/AkadeniaAzureStorage/blob/main/LICENSE)
 
