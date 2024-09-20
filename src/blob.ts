@@ -38,19 +38,24 @@ export class BlobStorage {
   }
 
   /**
+   * @param {string} [sasUrl] - Will construct the blob service client using the sas url if exists, the connection string otherwise
    * @returns {BlobServiceClient} - A BlobServiceClient object
    */
-  getBlobServiceUrl(): BlobServiceClient {
+  getBlobServiceUrl(sasUrl?: string): BlobServiceClient {
+    if (sasUrl) {
+      return new BlobServiceClient(sasUrl)
+    }
     return BlobServiceClient.fromConnectionString(this.connectionString)
   }
 
   /**
    * @param {string} containerName - The name of the container to check
    * @param {string} blobNamePrefix - The prefix of the blob name
+   * @param {string} [sasUrl] - Will construct the blob service client using the sas url if exists, the connection string otherwise
    * @returns {Promise<Array<BlobItem>>} - An array of BlobItem objects
    */
-  async listBlobs(containerName: string, blobNamePrefix: string) {
-    const blobService = this.getBlobServiceUrl()
+  async listBlobs(containerName: string, blobNamePrefix: string, sasUrl?: string) {
+    const blobService = this.getBlobServiceUrl(sasUrl)
     const container = blobService.getContainerClient(containerName)
     const result: BlobItem[] = []
     for await (const blob of container.listBlobsFlat({ prefix: blobNamePrefix })) {
@@ -63,10 +68,11 @@ export class BlobStorage {
   /**
    * @param {string} containerName - The name of the container to download from
    * @param {string} blobName - The name of the blob to download
+   * @param {string} [sasUrl] - Will construct the blob service client using the sas url if exists, the connection string otherwise
    * @returns {Promise<Buffer>} - A Buffer object
    */
-  async downloadBlob(containerName: string, blobName: string): Promise<Buffer> {
-    const blobService = this.getBlobServiceUrl()
+  async downloadBlob(containerName: string, blobName: string, sasUrl?: string): Promise<Buffer> {
+    const blobService = this.getBlobServiceUrl(sasUrl)
     const container = blobService.getContainerClient(containerName)
     const blob = container.getBlobClient(blobName)
 
@@ -76,10 +82,11 @@ export class BlobStorage {
   /**
    * @param {string} containerName - The name of the container to check
    * @param {string} blobName - The name of the blob to check
+   * @param {string} [sasUrl] - Will construct the blob service client using the sas url if exists, the connection string otherwise
    * @returns {Promise<boolean>} - A boolean indicating whether or not the blob exists
    */
-  async blobExists(containerName: string, blobName: string): Promise<boolean> {
-    const blobService = this.getBlobServiceUrl()
+  async blobExists(containerName: string, blobName: string, sasUrl?: string): Promise<boolean> {
+    const blobService = this.getBlobServiceUrl(sasUrl)
     const container = blobService.getContainerClient(containerName)
     const blob = container.getBlockBlobClient(blobName)
 
@@ -100,8 +107,9 @@ export class BlobStorage {
     body: HttpRequestBody,
     contentLength: number,
     contentType: string,
+    sasUrl?: string,
   ): Promise<boolean> {
-    const blobService = this.getBlobServiceUrl()
+    const blobService = this.getBlobServiceUrl(sasUrl)
     const container = blobService.getContainerClient(containerName)
     const blob = container.getBlockBlobClient(blobName)
 
@@ -116,6 +124,7 @@ export class BlobStorage {
    * @param {string} containerName - The name of the container to upload to
    * @param {string} blobName - The name of the blob to upload
    * @param data -  Buffer | Blob | ArrayBuffer | ArrayBufferView
+   * @param {string} [sasUrl] - Will construct the blob service client using the sas url if exists, the connection string otherwise
    * @param bufferSize - Size of every buffer allocated, also the block size in the uploaded block blob. Default value is 8MB
    * @returns {Promise<boolean>} - A boolean indicating whether or not the blob was successfully uploaded
    */
@@ -123,8 +132,9 @@ export class BlobStorage {
     containerName: string,
     blobName: string,
     data: Buffer | Blob | ArrayBuffer | ArrayBufferView,
+    sasUrl?: string,
   ): Promise<boolean> {
-    const blobService = this.getBlobServiceUrl()
+    const blobService = this.getBlobServiceUrl(sasUrl)
     const container = blobService.getContainerClient(containerName)
     const blob = container.getBlockBlobClient(blobName)
 
@@ -137,11 +147,12 @@ export class BlobStorage {
    * @param {string} containerName - The name of the container to upload to
    * @param {string} blobName - The name of the blob to upload
    * @param stream - Node.js Readable stream
+   * @param {string} [sasUrl] - Will construct the blob service client using the sas url if exists, the connection string otherwise
    * @param bufferSize - Size of every buffer allocated, also the block size in the uploaded block blob. Default value is 8MB
    * @returns {Promise<boolean>} - A boolean indicating whether or not the blob was successfully uploaded
    */
-  async uploadStream(containerName: string, blobName: string, stream: Readable): Promise<boolean> {
-    const blobService = this.getBlobServiceUrl()
+  async uploadStream(containerName: string, blobName: string, stream: Readable, sasUrl?: string): Promise<boolean> {
+    const blobService = this.getBlobServiceUrl(sasUrl)
     const container = blobService.getContainerClient(containerName)
     const blob = container.getBlockBlobClient(blobName)
 
