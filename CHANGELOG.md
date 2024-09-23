@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/akadenia/AkadeniaAzureStorage/compare/1.4.0...1.4.1) (2024-09-23)
+
+
+### Bug Fixes
+
+* **readme:** untrack the readme.hbs file ([#22](https://github.com/akadenia/AkadeniaAzureStorage/issues/22)) ([831ce9a](https://github.com/akadenia/AkadeniaAzureStorage/commit/831ce9a0afa2effd833f559f8c93714f117c2e72))
+
 # [1.4.0](https://github.com/akadenia/AkadeniaAzureStorage/compare/1.3.1...1.4.0) (2024-09-20)
 
 
