@@ -9,8 +9,7 @@
     "Blob Storage",
     "Queue Storage",
     "Table Storage",
-    "akadenia",
-    "storage"
+    "akadenia"
   ],
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.json",
