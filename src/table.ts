@@ -79,7 +79,7 @@ export class TableStorage {
    */
   async insert(entity: ITableEntity): Promise<boolean> {
     try {
-      this.tableClient.createEntity(entity)
+      await this.tableClient.createEntity(entity)
     } catch (error) {
       return false
     }
@@ -93,7 +93,7 @@ export class TableStorage {
    */
   async update(entity: ITableEntity): Promise<boolean> {
     try {
-      this.tableClient.updateEntity(entity)
+      await this.tableClient.updateEntity(entity)
     } catch (error) {
       return false
     }
@@ -107,7 +107,7 @@ export class TableStorage {
    */
   async upsert(entity: ITableEntity): Promise<boolean> {
     try {
-      this.tableClient.upsertEntity(entity)
+      await this.tableClient.upsertEntity(entity)
     } catch (error) {
       return false
     }
@@ -122,7 +122,7 @@ export class TableStorage {
    */
   async delete(partitionKey: string, rowKey: string): Promise<boolean> {
     try {
-      this.tableClient.deleteEntity(partitionKey, rowKey)
+      await this.tableClient.deleteEntity(partitionKey, rowKey)
     } catch (error) {
       return false
     }

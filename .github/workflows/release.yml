@@ -35,6 +35,9 @@ jobs:
       - name: Install dependencies
         run: npm clean-install
 
+      - name: Build
+        run: npm run build
+
       - uses: codfish/semantic-release-action@v3
         id: semantic
         env:
