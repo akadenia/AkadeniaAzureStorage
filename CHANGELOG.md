@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/akadenia/AkadeniaAzureStorage/compare/1.4.1...1.5.0) (2024-09-23)
+
+
+### Features
+
+* **queue:** add delete and receive queue messages ([a4bb0fb](https://github.com/akadenia/AkadeniaAzureStorage/commit/a4bb0fb70a809e050a9d912d063950b4086cd44b))
+
 ## [1.4.1](https://github.com/akadenia/AkadeniaAzureStorage/compare/1.4.0...1.4.1) (2024-09-23)
 
 
