@@ -30,4 +30,12 @@ export class QueueStorage {
   async sendMessage(message: string): Promise<any> {
     return this.queueClient.sendMessage(message)
   }
+
+  async receiveMessages(): Promise<any> {
+    return this.queueClient.receiveMessages()
+  }
+
+  async deleteMessage(messageId: string, popReceipt: string): Promise<void> {
+    await this.queueClient.deleteMessage(messageId, popReceipt)
+  }
 }
