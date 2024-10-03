@@ -14,6 +14,7 @@ describe("TableStorage", () => {
 
   it("should delete a table", async () => {
     const table = new TableStorage(storageConnectionString, "tableToBeDeleted")
+    await table.createTable()
     const result = await table.deleteTable()
 
     expect(result).toBe(true)
@@ -21,9 +22,11 @@ describe("TableStorage", () => {
 
   it("should insert an entity", async () => {
     const table = new TableStorage(storageConnectionString, "TestTableInsert")
+    table.createTable()
+
     const entity = {
-      partitionKey: "partitionKey",
-      rowKey: "rowKey",
+      partitionKey: `partitionKey`,
+      rowKey: `rowKey_${Math.random()}`,
       name: "name",
       age: 30,
     }
@@ -31,6 +34,8 @@ describe("TableStorage", () => {
     const result = await table.insert(entity)
 
     expect(result).toBe(true)
+
+    await table.deleteTable()
   })
 
   it("should get a TableClient object", () => {
@@ -109,4 +114,36 @@ describe("TableStorage", () => {
 
     await table.deleteTable()
   })
+})
+
+it("should update an entity", async () => {
+  const table = new TableStorage(storageConnectionString, "TestTableUpdate")
+  await table.createTable()
+
+  const entity = {
+    partitionKey: "p1",
+    rowKey: "1",
+    name: "name1",
+    age: 20,
+  }
+
+  await table.insert(entity)
+
+  entity.age = 30
+
+  const result = await table.update(entity)
+
+  expect(result).toBe(true)
+
+  jest.setTimeout(1000)
+
+  const entities = await table.list()
+
+  expect(entities).toBeDefined()
+  expect(entities.length).toBe(1)
+  expect(entities[0].age).toBe(30)
+
+  jest.setTimeout(500)
+
+  await table.deleteTable()
 })
