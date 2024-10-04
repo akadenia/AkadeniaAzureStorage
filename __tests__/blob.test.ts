@@ -31,7 +31,6 @@ describe("BlobStorage", () => {
     expect(result).toBe(false)
   })
 
-
   it("should generate a SAS URL and be able to create a file with it", async () => {
     const blob = new BlobStorage(storageConnectionString)
     blob.createContainer("testcontainer")
