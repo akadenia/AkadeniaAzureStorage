@@ -1,3 +1,10 @@
+## [1.5.1](https://github.com/akadenia/AkadeniaAzureStorage/compare/1.5.0...1.5.1) (2024-10-03)
+
+
+### Bug Fixes
+
+* **test,npm:** update homepage and fix table tests ([40f82eb](https://github.com/akadenia/AkadeniaAzureStorage/commit/40f82eb5135cc94b913a5cdbab98f4572c90b18d))
+
 # [1.5.0](https://github.com/akadenia/AkadeniaAzureStorage/compare/1.4.1...1.5.0) (2024-09-23)
 
 
