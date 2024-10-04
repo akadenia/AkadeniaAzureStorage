@@ -22,15 +22,6 @@ describe("BlobStorage", () => {
     expect(result).toEqual([])
   })
 
-  //   it("should download a blob", async () => {
-  //     const blob = new BlobStorage(storageConnectionString)
-  //     await blob.createContainer("testcontainer")
-
-  //     const result = await blob.downloadBlob("testcontainer", "testblob")
-
-  //     expect(result).toBeInstanceOf(Buffer)
-  //   })
-
   it("should check if a blob exists", async () => {
     const blob = new BlobStorage(storageConnectionString)
     blob.createContainer("testcontainer")

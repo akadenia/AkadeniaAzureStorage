@@ -8,14 +8,10 @@ import {
   HttpRequestBody,
   StorageSharedKeyCredential,
 } from "@azure/storage-blob"
-import { AzureLogger, setLogLevel } from "@azure/logger"
+import { setLogLevel } from "@azure/logger"
 import { Readable } from "stream"
 
-setLogLevel("verbose")
-
-AzureLogger.log = (...args) => {
-  console.log(...args)
-}
+setLogLevel("error")
 
 export enum BlobPermissions {
   READ = "r",
