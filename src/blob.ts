@@ -222,6 +222,6 @@ export class BlobStorage {
     const sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountKey)
     const sasToken = generateBlobSASQueryParameters(options, sharedKeyCredential).toString()
 
-    return `${blobService.url}?${sasToken}`
+    return `${container.url}?${sasToken}`
   }
 }
