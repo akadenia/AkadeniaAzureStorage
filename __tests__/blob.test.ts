@@ -36,27 +36,27 @@ describe("BlobStorage", () => {
     expect(result).toBe(false)
   })
 
-  it("should generate a valid SAS URL", async () => {  
-    const sasOptions: SASOptions = {  
-      startsOn: new Date(),  
-      expires: 3600,  
-      permissions: [BlobPermissions.WRITE],  
-    };  
-    const sasUrl = blob.generateSASUrl(containerName, blobPath, sasOptions);  
-    expect(sasUrl.split("?")?.[0]).toEqual("http://127.0.0.1:10000/devstoreaccount1");  
-  });  
+  it("should generate a valid SAS URL", async () => {
+    const sasOptions: SASOptions = {
+      startsOn: new Date(),
+      expires: 3600,
+      permissions: [BlobPermissions.WRITE],
+    }
+    const sasUrl = blob.generateSASUrl(containerName, blobPath, sasOptions)
+    expect(sasUrl.split("?")?.[0]).toEqual("http://127.0.0.1:10000/devstoreaccount1")
+  })
 
-  it("should upload data using SAS URL", async () => {  
-    const sasOptions: SASOptions = {  
-      startsOn: new Date(),  
-      expires: 3600,  
-      permissions: [BlobPermissions.WRITE],  
-    };  
-    const sasUrl = blob.generateSASUrl(containerName, blobPath, sasOptions);  
-    
-    await blob.uploadData(containerName, blobPath, Buffer.from("test data"), sasUrl);  
+  it("should upload data using SAS URL", async () => {
+    const sasOptions: SASOptions = {
+      startsOn: new Date(),
+      expires: 3600,
+      permissions: [BlobPermissions.WRITE],
+    }
+    const sasUrl = blob.generateSASUrl(containerName, blobPath, sasOptions)
 
-    const blobExists = await blob.blobExists(containerName, blobPath);  
-    expect(blobExists).toBe(true);  
-  });
+    await blob.uploadData(containerName, blobPath, Buffer.from("test data"), sasUrl)
+
+    const blobExists = await blob.blobExists(containerName, blobPath)
+    expect(blobExists).toBe(true)
+  })
 })
