@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/akadenia/AkadeniaAzureStorage/compare/1.5.1...1.6.0) (2024-10-07)
+
+
+### Features
+
+* **blob,sas-url:** add create and delete container, fix blob sas url, add tests ([#26](https://github.com/akadenia/AkadeniaAzureStorage/issues/26)) ([1c47116](https://github.com/akadenia/AkadeniaAzureStorage/commit/1c47116ddc2b1e22bda48bdf8786041ce25961c9))
+
 ## [1.5.1](https://github.com/akadenia/AkadeniaAzureStorage/compare/1.5.0...1.5.1) (2024-10-03)
 
 
