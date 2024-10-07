@@ -1,3 +1,10 @@
+## [1.6.1](https://github.com/akadenia/AkadeniaAzureStorage/compare/1.6.0...1.6.1) (2024-10-07)
+
+
+### Bug Fixes
+
+* **sas:** fix not detecting the container name from the sas url ([#28](https://github.com/akadenia/AkadeniaAzureStorage/issues/28)) ([3391880](https://github.com/akadenia/AkadeniaAzureStorage/commit/3391880e02b181576cc992aad07b8d39fcef0034))
+
 # [1.6.0](https://github.com/akadenia/AkadeniaAzureStorage/compare/1.5.1...1.6.0) (2024-10-07)
 
 
