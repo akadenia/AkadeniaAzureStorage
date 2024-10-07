@@ -49,6 +49,37 @@ export class BlobStorage {
   }
 
   /**
+   * Creates a container in Azure Blob Storage if it does not already exist.
+   *
+   * @param containerName - The name of the container to create.
+   * @param sasUrl - Optional. The SAS URL for accessing the Blob service. If not provided, the default Blob service URL will be used.
+   * @returns A promise that resolves to a boolean indicating whether the container was successfully created or already exists.
+   */
+  async createContainer(containerName: string, sasUrl?: string): Promise<boolean> {
+    const blobService = this.getBlobServiceUrl(sasUrl)
+    const container = blobService.getContainerClient(containerName)
+
+    const result = await container.createIfNotExists()
+    return result.succeeded
+  }
+
+  /**
+   * Deletes a container in Azure Blob Storage if it exists.
+   *
+   * @param containerName - The name of the container to delete.
+   * @param sasUrl - Optional. The SAS URL for authentication. If not provided, the default service URL will be used.
+   * @returns A promise that resolves to a boolean indicating whether the container was successfully deleted.
+   */
+  async deleteContainer(containerName: string, sasUrl?: string): Promise<boolean> {
+    const blobService = this.getBlobServiceUrl(sasUrl)
+    const container = blobService.getContainerClient(containerName)
+
+    const result = await container.deleteIfExists()
+
+    return result.succeeded
+  }
+
+  /**
    * @param {string} containerName - The name of the container to check
    * @param {string} blobNamePrefix - The prefix of the blob name
    * @param {string} [sasUrl] - Will construct the blob service client using the sas url if exists, the connection string otherwise
@@ -138,7 +169,7 @@ export class BlobStorage {
     const container = blobService.getContainerClient(containerName)
     const blob = container.getBlockBlobClient(blobName)
 
-    const response: BlobUploadCommonResponse = await blob.uploadData(data)
+    const response = await blob.uploadData(data)
 
     return response.errorCode === undefined
   }
@@ -191,6 +222,6 @@ export class BlobStorage {
     const sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountKey)
     const sasToken = generateBlobSASQueryParameters(options, sharedKeyCredential).toString()
 
-    return `${container.getBlockBlobClient(blobName).url}?${sasToken}`
+    return `${blobService.url}?${sasToken}`
   }
 }
