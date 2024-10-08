@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/akadenia/AkadeniaAzureStorage/compare/1.6.1...1.7.0) (2024-10-08)
+
+
+### Features
+
+* **blob:** add blob http headers for upload data and upload function ([#30](https://github.com/akadenia/AkadeniaAzureStorage/issues/30)) ([f4fec59](https://github.com/akadenia/AkadeniaAzureStorage/commit/f4fec59a087e566f58ece6c1e41a9c25e219907a))
+
 ## [1.6.1](https://github.com/akadenia/AkadeniaAzureStorage/compare/1.6.0...1.6.1) (2024-10-07)
 
 
