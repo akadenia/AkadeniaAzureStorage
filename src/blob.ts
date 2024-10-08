@@ -1,4 +1,5 @@
 import {
+  BlobHTTPHeaders,
   BlobItem,
   BlobSASPermissions,
   BlobServiceClient,
@@ -156,6 +157,7 @@ export class BlobStorage {
    * @param {string} blobName - The name of the blob to upload
    * @param data -  Buffer | Blob | ArrayBuffer | ArrayBufferView
    * @param {string} [sasUrl] - Will construct the blob service client using the sas url if exists, the connection string otherwise
+   * @param {BlobHTTPHeaders} [blobHTTPHeaders] - The blob HTTP headers to set while uploading the blob
    * @param bufferSize - Size of every buffer allocated, also the block size in the uploaded block blob. Default value is 8MB
    * @returns {Promise<boolean>} - A boolean indicating whether or not the blob was successfully uploaded
    */
@@ -164,12 +166,15 @@ export class BlobStorage {
     blobName: string,
     data: Buffer | Blob | ArrayBuffer | ArrayBufferView,
     sasUrl?: string,
+    blobHTTPHeaders?: BlobHTTPHeaders,
   ): Promise<boolean> {
     const blobService = this.getBlobServiceUrl(sasUrl)
     const container = blobService.getContainerClient(containerName)
     const blob = container.getBlockBlobClient(blobName)
 
-    const response = await blob.uploadData(data)
+    const response = await blob.uploadData(data, {
+      blobHTTPHeaders,
+    })
 
     return response.errorCode === undefined
   }
@@ -179,15 +184,24 @@ export class BlobStorage {
    * @param {string} blobName - The name of the blob to upload
    * @param stream - Node.js Readable stream
    * @param {string} [sasUrl] - Will construct the blob service client using the sas url if exists, the connection string otherwise
+   * @param {BlobHTTPHeaders} [blobHTTPHeaders] - The blob HTTP headers to set while uploading the blob
    * @param bufferSize - Size of every buffer allocated, also the block size in the uploaded block blob. Default value is 8MB
    * @returns {Promise<boolean>} - A boolean indicating whether or not the blob was successfully uploaded
    */
-  async uploadStream(containerName: string, blobName: string, stream: Readable, sasUrl?: string): Promise<boolean> {
+  async uploadStream(
+    containerName: string,
+    blobName: string,
+    stream: Readable,
+    sasUrl?: string,
+    blobHTTPHeaders?: BlobHTTPHeaders,
+  ): Promise<boolean> {
     const blobService = this.getBlobServiceUrl(sasUrl)
     const container = blobService.getContainerClient(containerName)
     const blob = container.getBlockBlobClient(blobName)
 
-    const response: BlobUploadCommonResponse = await blob.uploadStream(stream)
+    const response: BlobUploadCommonResponse = await blob.uploadStream(stream, undefined, undefined, {
+      blobHTTPHeaders,
+    })
 
     return response.errorCode === undefined
   }

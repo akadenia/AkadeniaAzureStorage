@@ -61,4 +61,28 @@ describe("BlobStorage", () => {
     const blobExists = await blob.blobExists(containerName, blobPath)
     expect(blobExists).toBe(true)
   })
+
+  it("should upload data using SAS URL and set the content type", async () => {
+    const sasOptions: SASOptions = {
+      startsOn: new Date(),
+      expires: 3600,
+      permissions: [BlobPermissions.WRITE],
+    }
+    const sasUrl = blob.generateSASUrl(containerName, blobPath, sasOptions)
+
+    const newBlob = new BlobStorage(sasUrl)
+
+    await newBlob.uploadData("", blobPath, Buffer.from("test data"), sasUrl, {
+      blobContentType: "text/plain",
+    })
+
+    const blobExists = await blob.blobExists(containerName, blobPath)
+    expect(blobExists).toBe(true)
+
+    // Check the content type of the blob
+    const currentBlob = blob.getBlobServiceUrl().getContainerClient(containerName).getBlockBlobClient(blobPath)
+    const blobProperties = await currentBlob.getProperties()
+    expect(blobProperties.blobType).toBe("BlockBlob")
+    expect(blobProperties.contentType).toBe("text/plain")
+  })
 })
