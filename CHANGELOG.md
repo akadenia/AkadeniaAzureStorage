@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/akadenia/AkadeniaAzureStorage/compare/1.7.0...1.8.0) (2024-12-20)
+
+
+### Features
+
+* **deps:** upgrade npm dependencies ([d3bbaa7](https://github.com/akadenia/AkadeniaAzureStorage/commit/d3bbaa7aaab3b95161cb82193dedb7a96983eff0))
+
 # [1.7.0](https://github.com/akadenia/AkadeniaAzureStorage/compare/1.6.1...1.7.0) (2024-10-08)
 
 
