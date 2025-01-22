@@ -24,7 +24,7 @@ export enum BlobPermissions {
 
 export interface SASOptions {
   startsOn?: Date
-  expires?: number
+  expiresOn?: Date
   permissions?: BlobPermissions[]
 }
 
@@ -216,13 +216,17 @@ export class BlobStorage {
     const blobService = this.getBlobServiceUrl()
     const container = blobService.getContainerClient(containerName)
 
-    const { startsOn = new Date(), expires = 3600, permissions = [BlobPermissions.READ] } = sasOptions
+    const {
+      startsOn = new Date(),
+      expiresOn = new Date(new Date().valueOf() + 3600 * 1000),
+      permissions = [BlobPermissions.READ],
+    } = sasOptions
 
     const options = {
       containerName,
       blobName,
       startsOn,
-      expiresOn: new Date(Date.now() + expires * 1000),
+      expiresOn,
       permissions: BlobSASPermissions.parse(permissions.join("")),
     }
 

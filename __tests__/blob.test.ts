@@ -39,7 +39,7 @@ describe("BlobStorage", () => {
   it("should generate a valid SAS URL", async () => {
     const sasOptions: SASOptions = {
       startsOn: new Date(),
-      expires: 3600,
+      expiresOn: new Date(new Date().valueOf() + 3600 * 1000),
       permissions: [BlobPermissions.WRITE],
     }
     const sasUrl = blob.generateSASUrl(containerName, blobPath, sasOptions)
@@ -49,7 +49,7 @@ describe("BlobStorage", () => {
   it("should upload data using SAS URL", async () => {
     const sasOptions: SASOptions = {
       startsOn: new Date(),
-      expires: 3600,
+      expiresOn: new Date(new Date().valueOf() + 3600 * 1000),
       permissions: [BlobPermissions.WRITE],
     }
     const sasUrl = blob.generateSASUrl(containerName, blobPath, sasOptions)
@@ -65,7 +65,7 @@ describe("BlobStorage", () => {
   it("should upload data using SAS URL and set the content type", async () => {
     const sasOptions: SASOptions = {
       startsOn: new Date(),
-      expires: 3600,
+      expiresOn: new Date(new Date().valueOf() + 3600 * 1000),
       permissions: [BlobPermissions.WRITE],
     }
     const sasUrl = blob.generateSASUrl(containerName, blobPath, sasOptions)
