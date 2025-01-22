@@ -35,6 +35,9 @@ export class BlobStorage {
   private connectionStringOrSASUrl: string
 
   constructor(connectionStringOrSASUrl: string) {
+    if (!connectionStringOrSASUrl) {
+      throw new Error("Connection string or SAS URL is required")
+    }
     this.connectionStringOrSASUrl = connectionStringOrSASUrl
   }
 
