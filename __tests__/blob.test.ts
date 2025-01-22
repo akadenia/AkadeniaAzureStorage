@@ -1,38 +1,38 @@
-import { afterEach, beforeEach, describe, expect, it, jest } from "@jest/globals"
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, jest } from "@jest/globals"
 
 import { BlobStorage, BlobPermissions, SASOptions } from "../src/blob"
-import exp from "constants"
-
-const storageConnectionString =
-  "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;"
 
 describe("BlobStorage", () => {
-  const blob = new BlobStorage(storageConnectionString)
-  const containerName = "testcontainer"
-  const blobPath = "path/testblob.txt"
+  const storageConnectionString =
+    "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;"
 
-  beforeEach(async () => {
-    const containerCreated = await blob.createContainer(containerName)
+  const blobClient = new BlobStorage(storageConnectionString)
+  const containerName = `testcontainer-${Math.random().toString(36).substring(2, 15)}`
+  let blobName = "path/testblob.txt"
+  const accountName = "projectagramstg"
+
+  beforeAll(async () => {
+    const containerCreated = await blobClient.createContainer(containerName)
     expect(containerCreated).toBe(true)
   })
 
-  afterEach(async () => {
-    await blob.deleteContainer(containerName)
+  afterAll(async () => {
+    await blobClient.deleteContainer(containerName)
   })
 
   it("should get a BlobServiceClient object", () => {
-    const blobServiceClient = blob.getBlobServiceUrl()
+    const blobServiceClient = blobClient.getBlobServiceUrl()
 
     expect(blobServiceClient).toBeDefined()
   })
 
   it("should list blobs", async () => {
-    const result = await blob.listBlobs(containerName, "testblob")
+    const result = await blobClient.listBlobs(containerName, "testblob")
     expect(result).toEqual([])
   })
 
   it("should check if a blob exists", async () => {
-    const result = await blob.blobExists(containerName, "testblob")
+    const result = await blobClient.blobExists(containerName, "testblob")
     expect(result).toBe(false)
   })
 
@@ -42,23 +42,28 @@ describe("BlobStorage", () => {
       expiresOn: new Date(new Date().valueOf() + 3600 * 1000),
       permissions: [BlobPermissions.WRITE],
     }
-    const sasUrl = blob.generateSASUrl(containerName, blobPath, sasOptions)
-    expect(sasUrl.split("?")?.[0]).toEqual(`http://127.0.0.1:10000/devstoreaccount1/${containerName}`)
+
+    const sasUrl = blobClient.generateSASUrl(containerName, "", sasOptions)
+    expect(sasUrl.split("?")?.[0]).toEqual(blobClient.getBlobServiceUrl().url)
+    expect(sasUrl).toContain("sp=w")
+    expect(sasUrl).toContain("sig=")
+    expect(sasUrl).toContain("se=")
+    expect(sasUrl).toContain("st=")
+    expect(sasUrl).toContain("sr=")
   })
 
   it("should upload data using SAS URL", async () => {
     const sasOptions: SASOptions = {
-      startsOn: new Date(),
-      expiresOn: new Date(new Date().valueOf() + 3600 * 1000),
       permissions: [BlobPermissions.WRITE],
     }
-    const sasUrl = blob.generateSASUrl(containerName, blobPath, sasOptions)
 
-    const newBlob = new BlobStorage(sasUrl)
+    const sasUrl = blobClient.generateSASUrl(containerName, blobName, sasOptions)
 
-    await newBlob.uploadData("", blobPath, Buffer.from("test data"), sasUrl)
+    const newBlobClient = new BlobStorage(sasUrl)
 
-    const blobExists = await blob.blobExists(containerName, blobPath)
+    await newBlobClient.uploadData(containerName, blobName, Buffer.from("test data"))
+
+    const blobExists = await blobClient.blobExists(containerName, blobName)
     expect(blobExists).toBe(true)
   })
 
@@ -68,21 +73,39 @@ describe("BlobStorage", () => {
       expiresOn: new Date(new Date().valueOf() + 3600 * 1000),
       permissions: [BlobPermissions.WRITE],
     }
-    const sasUrl = blob.generateSASUrl(containerName, blobPath, sasOptions)
+    const sasUrl = blobClient.generateSASUrl(containerName, blobName, sasOptions)
 
-    const newBlob = new BlobStorage(sasUrl)
+    const newBlobClient = new BlobStorage(sasUrl)
 
-    await newBlob.uploadData("", blobPath, Buffer.from("test data"), sasUrl, {
+    await newBlobClient.uploadData(containerName, blobName, Buffer.from("test data"), {
       blobContentType: "text/plain",
     })
 
-    const blobExists = await blob.blobExists(containerName, blobPath)
+    const blobExists = await blobClient.blobExists(containerName, blobName)
     expect(blobExists).toBe(true)
 
     // Check the content type of the blob
-    const currentBlob = blob.getBlobServiceUrl().getContainerClient(containerName).getBlockBlobClient(blobPath)
+    const currentBlob = blobClient.getBlobServiceUrl().getContainerClient(containerName).getBlockBlobClient(blobName)
     const blobProperties = await currentBlob.getProperties()
     expect(blobProperties.blobType).toBe("BlockBlob")
     expect(blobProperties.contentType).toBe("text/plain")
+  })
+
+  it("should generate a valid SAS URL with read-only access", async () => {
+    blobName = "path/sasReadBlob.txt"
+
+    await blobClient.uploadData(containerName, blobName, Buffer.from("readable test data"))
+
+    const sasOptions: SASOptions = {
+      startsOn: new Date(),
+      expiresOn: new Date(new Date().valueOf() + 3600 * 1000),
+      permissions: [BlobPermissions.READ],
+    }
+    const sasUrl = blobClient.generateSASUrl(containerName, blobName, sasOptions)
+
+    const newBlobClient = new BlobStorage(sasUrl)
+    const data = await newBlobClient.downloadBlob(containerName, blobName)
+
+    expect(data).toEqual(Buffer.from("readable test data"))
   })
 })
