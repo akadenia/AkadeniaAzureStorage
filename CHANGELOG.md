@@ -1,3 +1,32 @@
+# [2.0.0](https://github.com/akadenia/AkadeniaAzureStorage/compare/1.8.0...2.0.0) (2025-01-22)
+
+
+### Bug Fixes
+
+* **blob:** update generateSASUrl method to take expiresOn as a Date ([#33](https://github.com/akadenia/AkadeniaAzureStorage/issues/33)) ([394ec74](https://github.com/akadenia/AkadeniaAzureStorage/commit/394ec74f3859b3d12b31ce25c8d781531e63bf2f))
+
+
+### BREAKING CHANGES
+
+* **blob:** Sas option `expires: number` was replaced by `expiresOn: Date`
+
+<!-- This is an auto-generated comment: release notes by coderabbit.ai
+-->
+
+## Summary by CodeRabbit
+
+- **New Features**
+- Updated SAS (Shared Access Signature) token generation to use explicit
+date-based expiration
+- Improved handling of token expiration times with more precise `Date`
+object support
+
+- **Bug Fixes**
+- Refined SAS URL generation to provide clearer expiration time
+management
+
+<!-- end of auto-generated comment: release notes by coderabbit.ai -->
+
 # [1.8.0](https://github.com/akadenia/AkadeniaAzureStorage/compare/1.7.0...1.8.0) (2024-12-20)
 
 
