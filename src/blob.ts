@@ -35,6 +35,9 @@ export class BlobStorage {
   private connectionStringOrSASUrl: string
 
   constructor(connectionStringOrSASUrl: string) {
+    if (!connectionStringOrSASUrl) {
+      throw new Error("Connection string or SAS URL is required")
+    }
     this.connectionStringOrSASUrl = connectionStringOrSASUrl
   }
 
@@ -231,8 +234,13 @@ export class BlobStorage {
       permissions: BlobSASPermissions.parse(permissions.join("")),
     }
 
-    const accountName = this.connectionStringOrSASUrl.match(/AccountName=(.+?);/)?.[1]
-    const accountKey = this.connectionStringOrSASUrl.match(/AccountKey=(.+?);/)?.[1]
+    const parts = this.connectionStringOrSASUrl.split(';')
+    const accountName = parts
+      .find(p => p.startsWith('AccountName='))
+      ?.split('=')[1]
+    const accountKey = parts
+      .find(p => p.startsWith('AccountKey='))
+      ?.split('=')[1]
 
     if (!(accountName && accountKey)) {
       throw new Error("Could not extract account name and account key from connection string")
