@@ -7,9 +7,10 @@ describe("BlobStorage", () => {
     "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;"
 
   const blobClient = new BlobStorage(storageConnectionString)
+
+
   const containerName = `testcontainer-${Math.random().toString(36).substring(2, 15)}`
   let blobName = "path/testblob.txt"
-  const accountName = "projectagramstg"
 
   beforeAll(async () => {
     const containerCreated = await blobClient.createContainer(containerName)
@@ -22,7 +23,6 @@ describe("BlobStorage", () => {
 
   it("should get a BlobServiceClient object", () => {
     const blobServiceClient = blobClient.getBlobServiceUrl()
-
     expect(blobServiceClient).toBeDefined()
   })
 
@@ -67,13 +67,22 @@ describe("BlobStorage", () => {
     expect(blobExists).toBe(true)
   })
 
-  it("should upload data using SAS URL and set the content type", async () => {
+  it("should fail on invalid permissions", async () => {
+    const sasOptions: SASOptions = {
+      permissions: [BlobPermissions.READ],
+    }
+    const sasUrl = blobClient.generateSASUrl(containerName, blobName, sasOptions)
+    const newBlobClient = new BlobStorage(sasUrl)
+    await expect(newBlobClient.uploadData(containerName, blobName, Buffer.from("test data"))).rejects.toThrow()
+  })
+
+  it("should succeed on upload blob to a container with correct sas permissions", async () => {
     const sasOptions: SASOptions = {
       startsOn: new Date(),
       expiresOn: new Date(new Date().valueOf() + 3600 * 1000),
-      permissions: [BlobPermissions.WRITE],
+      permissions: [BlobPermissions.ADD, BlobPermissions.WRITE],
     }
-    const sasUrl = blobClient.generateSASUrl(containerName, blobName, sasOptions)
+    const sasUrl = blobClient.generateSASUrl(containerName, undefined, sasOptions)
 
     const newBlobClient = new BlobStorage(sasUrl)
 
@@ -89,6 +98,25 @@ describe("BlobStorage", () => {
     const blobProperties = await currentBlob.getProperties()
     expect(blobProperties.blobType).toBe("BlockBlob")
     expect(blobProperties.contentType).toBe("text/plain")
+  })
+
+  it("should fail on adding a blob to a container with sas permissions under a different blob name", async () => {
+    const sasOptions: SASOptions = {
+      permissions: [BlobPermissions.ADD, BlobPermissions.WRITE],
+    }
+    const sasUrl = blobClient.generateSASUrl(containerName, "specificblobname.txt", sasOptions)
+    const newBlobClient = new BlobStorage(sasUrl)
+    await expect(newBlobClient.uploadData(containerName, "differentblobname.txt", Buffer.from("test data"))).rejects.toThrow()
+  })
+
+
+  it("should succeed on adding a blob to a container with sas permissions under a same blob name", async () => {
+    const sasOptions: SASOptions = {
+      permissions: [BlobPermissions.ADD, BlobPermissions.WRITE],
+    }
+    const sasUrl = blobClient.generateSASUrl(containerName, "specificblobname.txt", sasOptions)
+    const newBlobClient = new BlobStorage(sasUrl)
+    await expect(newBlobClient.uploadData(containerName, "specificblobname.txt", Buffer.from("test data"))).resolves.toBe(true)
   })
 
   it("should generate a valid SAS URL with read-only access", async () => {
