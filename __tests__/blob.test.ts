@@ -8,7 +8,6 @@ describe("BlobStorage", () => {
 
   const blobClient = new BlobStorage(storageConnectionString)
 
-
   const containerName = `testcontainer-${Math.random().toString(36).substring(2, 15)}`
   let blobName = "path/testblob.txt"
 
@@ -108,7 +107,6 @@ describe("BlobStorage", () => {
     const newBlobClient = new BlobStorage(sasUrl)
     await expect(newBlobClient.uploadData(containerName, "differentblobname.txt", Buffer.from("test data"))).rejects.toThrow()
   })
-
 
   it("should succeed on adding a blob to a container with sas permissions under a same blob name", async () => {
     const sasOptions: SASOptions = {
