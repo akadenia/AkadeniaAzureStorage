@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/akadenia/AkadeniaAzureStorage/compare/2.0.0...2.1.0) (2025-01-25)
+
+
+### Features
+
+* **sas:** rework the logic around sas urls ([#35](https://github.com/akadenia/AkadeniaAzureStorage/issues/35)) ([e7f6f44](https://github.com/akadenia/AkadeniaAzureStorage/commit/e7f6f444067bb96dc8de15363e2088aec26ba6bf))
+
 # [2.0.0](https://github.com/akadenia/AkadeniaAzureStorage/compare/1.8.0...2.0.0) (2025-01-22)
 
 
