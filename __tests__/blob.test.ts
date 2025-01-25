@@ -134,4 +134,23 @@ describe("BlobStorage", () => {
 
     expect(data).toEqual(Buffer.from("readable test data"))
   })
+
+  it("should upload a text file to a container then be able to retrieve it via fetch with sas url", async () => {
+    const sasOptions: SASOptions = {
+      permissions: [BlobPermissions.READ],
+    }
+    await blobClient.uploadData(containerName, blobName, Buffer.from("readable test data"))
+
+    const sasUrl = blobClient.generateSASUrl(containerName, blobName, sasOptions)
+
+    const urlParts = sasUrl.split("?")
+    const baseUrl = urlParts[0]
+    const queryString = urlParts[1]
+
+    const response = await fetch(`${baseUrl}/${containerName}/${blobName}?${queryString}`)
+
+    const text = await response.text()
+    expect(response.status).toBe(200)
+    expect(text).toBe("readable test data")
+  })
 })
