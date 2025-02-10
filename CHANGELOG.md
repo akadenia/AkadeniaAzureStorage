@@ -1,3 +1,10 @@
+# [2.2.0](https://github.com/akadenia/AkadeniaAzureStorage/compare/2.1.0...2.2.0) (2025-02-10)
+
+
+### Features
+
+* **blob:** implement ability to delete a blob ([#37](https://github.com/akadenia/AkadeniaAzureStorage/issues/37)) ([f376176](https://github.com/akadenia/AkadeniaAzureStorage/commit/f376176310a7fc8231d506303beceefdc16b96f9))
+
 # [2.1.0](https://github.com/akadenia/AkadeniaAzureStorage/compare/2.0.0...2.1.0) (2025-01-25)
 
 
