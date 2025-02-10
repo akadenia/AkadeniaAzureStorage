@@ -153,4 +153,70 @@ describe("BlobStorage", () => {
     expect(response.status).toBe(200)
     expect(text).toBe("readable test data")
   })
+
+  describe("deleteBlob", () => {
+    it("should delete an existing blob", async () => {
+      // First upload a blob
+      const testBlobName = "delete-test-blob.txt"
+      await blobClient.uploadData(containerName, testBlobName, Buffer.from("test data"))
+
+      // Verify blob exists
+      let exists = await blobClient.blobExists(containerName, testBlobName)
+      expect(exists).toBe(true)
+
+      // Delete the blob
+      const deleteResult = await blobClient.deleteBlob(containerName, testBlobName)
+      expect(deleteResult).toBe(true)
+
+      // Verify blob no longer exists
+      exists = await blobClient.blobExists(containerName, testBlobName)
+      expect(exists).toBe(false)
+    })
+
+    it("should return true when attempting to delete a non-existent blob with connection string", async () => {
+      const nonExistentBlobName = "non-existent-blob.txt"
+
+      // Verify blob doesn't exist
+      const exists = await blobClient.blobExists(containerName, nonExistentBlobName)
+      expect(exists).toBe(false)
+
+      // Attempt to delete non-existent blob
+      const deleteResult = await blobClient.deleteBlob(containerName, nonExistentBlobName)
+      expect(deleteResult).toBe(true)
+    })
+
+    it("should fail when attempting to delete a non-existent blob with SAS URL", async () => {
+      const nonExistentBlobName = "non-existent-blob.txt"
+
+      const sasOptions: SASOptions = {
+        permissions: [BlobPermissions.DELETE, BlobPermissions.READ, BlobPermissions.WRITE],
+      }
+      const sasUrl = blobClient.generateSASUrl(containerName, nonExistentBlobName, sasOptions)
+      const sasClient = new BlobStorage(sasUrl)
+
+      // Attempt to delete non-existent blob should throw
+      await expect(sasClient.deleteBlob(containerName, nonExistentBlobName)).rejects.toThrow()
+    })
+
+    it("should delete blob with SAS URL having delete permission", async () => {
+      // First upload a blob
+      const testBlobName = "sas-delete-test-blob.txt"
+      await blobClient.uploadData(containerName, testBlobName, Buffer.from("test data"))
+
+      // Create SAS URL with delete permission
+      const sasOptions: SASOptions = {
+        permissions: [BlobPermissions.DELETE, BlobPermissions.READ, BlobPermissions.WRITE],
+      }
+      const sasUrl = blobClient.generateSASUrl(containerName, testBlobName, sasOptions)
+      const sasClient = new BlobStorage(sasUrl)
+
+      // Delete using SAS client
+      const deleteResult = await sasClient.deleteBlob(containerName, testBlobName)
+      expect(deleteResult).toBe(true)
+
+      // Verify blob no longer exists
+      const exists = await blobClient.blobExists(containerName, testBlobName)
+      expect(exists).toBe(false)
+    })
+  })
 })

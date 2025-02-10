@@ -247,4 +247,30 @@ export class BlobStorage {
 
     return `${blobService.url}?${sasToken}`
   }
+
+  /**
+   * Deletes a blob from the specified container.
+   *
+   * @param {string} containerName - The name of the container containing the blob
+   * @param {string} blobName - The name of the blob to delete
+   * @returns {Promise<boolean>} - A boolean indicating whether the blob was successfully deleted
+   */
+  async deleteBlob(containerName: string, blobName: string): Promise<boolean> {
+    const blobService = this.getBlobServiceUrl()
+    const container = blobService.getContainerClient(containerName)
+    const blob = container.getBlockBlobClient(blobName)
+
+    try {
+      const response = await blob.delete()
+      return response.errorCode === undefined
+    } catch (error: any) {
+      if (error.statusCode === 404) {
+        if (!this.isSASUrl()) {
+          return true
+        }
+        throw error
+      }
+      throw error
+    }
+  }
 }
