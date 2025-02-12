@@ -28,6 +28,14 @@ export interface SASOptions {
   permissions?: BlobPermissions[]
 }
 
+interface SASUrlComponents {
+  sasQueryString: string
+  containerName: string
+  blobName?: string
+  fullUrl: string
+  fullUrlWithSAS: string
+}
+
 /**
  * @class BlobStorage - A class that contains azure blob storage helpers
  */
@@ -212,12 +220,19 @@ export class BlobStorage {
   }
 
   /**
-   * @param {string} containerName - The name of the blob container.
-   * @param {string} blobName - The name of the blob.
-   * @param {SASOptions} sasOptions - The options used for generating the SAS query.
-   * @returns {string} - The storage account url with SAS token as query parameters
+   * * Generates a Shared Access Signature (SAS) URL for a blob or container
+   *
+   * @param {string} containerName - The name of the blob container
+   * @param {string} [blobName] - Optional. The name of the specific blob. If not provided, the SAS token will be generated for the container level
+   * @param {SASOptions} [sasOptions={}] - Optional. The options used for generating the SAS token
+   * @returns {SASUrlComponents} - Object containing:
+   *   - fullUrlWithSAS: The complete URL with SAS token
+   *   - fullUrl: The complete URL without SAS token
+   *   - containerName: The name of the blob container
+   *   - blobName: The name of the specific blob (if provided)
+   *   - sasQueryString: The SAS token query parameters
    */
-  generateSASUrl(containerName: string, blobName?: string, sasOptions: SASOptions = {}): string {
+  generateSASUrl(containerName: string, blobName?: string, sasOptions: SASOptions = {}): SASUrlComponents {
     const blobService = this.getBlobServiceUrl()
 
     const {
@@ -243,9 +258,23 @@ export class BlobStorage {
     }
 
     const sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountKey)
-    const sasToken = generateBlobSASQueryParameters(options, sharedKeyCredential).toString()
+    const sasQueryString = generateBlobSASQueryParameters(options, sharedKeyCredential).toString()
+    const baseUrl = blobService.url
+    const fullUrl = `${baseUrl}?${sasQueryString}`
 
-    return `${blobService.url}?${sasToken}`
+    let fullUrlWithSAS = `${baseUrl}/${containerName}`
+    if (blobName) {
+      fullUrlWithSAS += `/${blobName}`
+    }
+    fullUrlWithSAS += `?${sasQueryString}`
+
+    return {
+      sasQueryString,
+      fullUrl,
+      fullUrlWithSAS,
+      containerName,
+      blobName,
+    }
   }
 
   /**
