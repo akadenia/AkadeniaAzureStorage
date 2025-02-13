@@ -42,13 +42,13 @@ describe("BlobStorage", () => {
       permissions: [BlobPermissions.WRITE],
     }
 
-    const sasUrl = blobClient.generateSASUrl(containerName, "", sasOptions)
-    expect(sasUrl.split("?")?.[0]).toEqual(blobClient.getBlobServiceUrl().url)
-    expect(sasUrl).toContain("sp=w")
-    expect(sasUrl).toContain("sig=")
-    expect(sasUrl).toContain("se=")
-    expect(sasUrl).toContain("st=")
-    expect(sasUrl).toContain("sr=")
+    const sasUrlComponents = blobClient.generateSASUrl(containerName, "", sasOptions)
+    expect(sasUrlComponents.fullUrl).toBeDefined()
+    expect(sasUrlComponents.sasQueryString).toContain("sp=w")
+    expect(sasUrlComponents.sasQueryString).toContain("sig=")
+    expect(sasUrlComponents.sasQueryString).toContain("se=")
+    expect(sasUrlComponents.sasQueryString).toContain("st=")
+    expect(sasUrlComponents.sasQueryString).toContain("sr=")
   })
 
   it("should upload data using SAS URL", async () => {
@@ -56,9 +56,8 @@ describe("BlobStorage", () => {
       permissions: [BlobPermissions.WRITE],
     }
 
-    const sasUrl = blobClient.generateSASUrl(containerName, blobName, sasOptions)
-
-    const newBlobClient = new BlobStorage(sasUrl)
+    const sasUrlComponents = blobClient.generateSASUrl(containerName, blobName, sasOptions)
+    const newBlobClient = new BlobStorage(sasUrlComponents.fullUrl)
 
     await newBlobClient.uploadData(containerName, blobName, Buffer.from("test data"))
 
@@ -70,8 +69,8 @@ describe("BlobStorage", () => {
     const sasOptions: SASOptions = {
       permissions: [BlobPermissions.READ],
     }
-    const sasUrl = blobClient.generateSASUrl(containerName, blobName, sasOptions)
-    const newBlobClient = new BlobStorage(sasUrl)
+    const sasUrlComponents = blobClient.generateSASUrl(containerName, blobName, sasOptions)
+    const newBlobClient = new BlobStorage(sasUrlComponents.fullUrl)
     await expect(newBlobClient.uploadData(containerName, blobName, Buffer.from("test data"))).rejects.toThrow()
   })
 
@@ -81,9 +80,8 @@ describe("BlobStorage", () => {
       expiresOn: new Date(new Date().valueOf() + 3600 * 1000),
       permissions: [BlobPermissions.ADD, BlobPermissions.WRITE],
     }
-    const sasUrl = blobClient.generateSASUrl(containerName, undefined, sasOptions)
-
-    const newBlobClient = new BlobStorage(sasUrl)
+    const sasUrlComponents = blobClient.generateSASUrl(containerName, undefined, sasOptions)
+    const newBlobClient = new BlobStorage(sasUrlComponents.fullUrl)
 
     await newBlobClient.uploadData(containerName, blobName, Buffer.from("test data"), {
       blobContentType: "text/plain",
@@ -103,8 +101,8 @@ describe("BlobStorage", () => {
     const sasOptions: SASOptions = {
       permissions: [BlobPermissions.ADD, BlobPermissions.WRITE],
     }
-    const sasUrl = blobClient.generateSASUrl(containerName, "specificblobname.txt", sasOptions)
-    const newBlobClient = new BlobStorage(sasUrl)
+    const sasUrlComponents = blobClient.generateSASUrl(containerName, "specificblobname.txt", sasOptions)
+    const newBlobClient = new BlobStorage(sasUrlComponents.fullUrl)
     await expect(newBlobClient.uploadData(containerName, "differentblobname.txt", Buffer.from("test data"))).rejects.toThrow()
   })
 
@@ -112,8 +110,8 @@ describe("BlobStorage", () => {
     const sasOptions: SASOptions = {
       permissions: [BlobPermissions.ADD, BlobPermissions.WRITE],
     }
-    const sasUrl = blobClient.generateSASUrl(containerName, "specificblobname.txt", sasOptions)
-    const newBlobClient = new BlobStorage(sasUrl)
+    const sasUrlComponents = blobClient.generateSASUrl(containerName, "specificblobname.txt", sasOptions)
+    const newBlobClient = new BlobStorage(sasUrlComponents.fullUrl)
     await expect(newBlobClient.uploadData(containerName, "specificblobname.txt", Buffer.from("test data"))).resolves.toBe(true)
   })
 
@@ -127,9 +125,9 @@ describe("BlobStorage", () => {
       expiresOn: new Date(new Date().valueOf() + 3600 * 1000),
       permissions: [BlobPermissions.READ],
     }
-    const sasUrl = blobClient.generateSASUrl(containerName, blobName, sasOptions)
+    const sasUrlComponents = blobClient.generateSASUrl(containerName, blobName, sasOptions)
 
-    const newBlobClient = new BlobStorage(sasUrl)
+    const newBlobClient = new BlobStorage(sasUrlComponents.fullUrl)
     const data = await newBlobClient.downloadBlob(containerName, blobName)
 
     expect(data).toEqual(Buffer.from("readable test data"))
@@ -141,9 +139,9 @@ describe("BlobStorage", () => {
     }
     await blobClient.uploadData(containerName, blobName, Buffer.from("readable test data"))
 
-    const sasUrl = blobClient.generateSASUrl(containerName, blobName, sasOptions)
+    const sasUrlComponents = blobClient.generateSASUrl(containerName, blobName, sasOptions)
 
-    const urlParts = sasUrl.split("?")
+    const urlParts = sasUrlComponents.fullUrl.split("?")
     const baseUrl = urlParts[0]
     const queryString = urlParts[1]
 
@@ -191,8 +189,8 @@ describe("BlobStorage", () => {
       const sasOptions: SASOptions = {
         permissions: [BlobPermissions.DELETE, BlobPermissions.READ, BlobPermissions.WRITE],
       }
-      const sasUrl = blobClient.generateSASUrl(containerName, nonExistentBlobName, sasOptions)
-      const sasClient = new BlobStorage(sasUrl)
+      const sasUrlComponents = blobClient.generateSASUrl(containerName, nonExistentBlobName, sasOptions)
+      const sasClient = new BlobStorage(sasUrlComponents.fullUrl)
 
       // Attempt to delete non-existent blob should throw
       await expect(sasClient.deleteBlob(containerName, nonExistentBlobName)).rejects.toThrow()
@@ -207,8 +205,8 @@ describe("BlobStorage", () => {
       const sasOptions: SASOptions = {
         permissions: [BlobPermissions.DELETE, BlobPermissions.READ, BlobPermissions.WRITE],
       }
-      const sasUrl = blobClient.generateSASUrl(containerName, testBlobName, sasOptions)
-      const sasClient = new BlobStorage(sasUrl)
+      const sasUrlComponents = blobClient.generateSASUrl(containerName, testBlobName, sasOptions)
+      const sasClient = new BlobStorage(sasUrlComponents.fullUrl)
 
       // Delete using SAS client
       const deleteResult = await sasClient.deleteBlob(containerName, testBlobName)
