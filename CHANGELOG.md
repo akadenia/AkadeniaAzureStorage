@@ -1,3 +1,10 @@
+# [2.3.0](https://github.com/akadenia/AkadeniaAzureStorage/compare/2.2.0...2.3.0) (2025-02-13)
+
+
+### Features
+
+* **sas-url:** change the response structure of sas url generator ([#39](https://github.com/akadenia/AkadeniaAzureStorage/issues/39)) ([7ec3893](https://github.com/akadenia/AkadeniaAzureStorage/commit/7ec38931b1a911f1591d045061df9abf07488fd3))
+
 # [2.2.0](https://github.com/akadenia/AkadeniaAzureStorage/compare/2.1.0...2.2.0) (2025-02-10)
 
 
