@@ -1,3 +1,10 @@
+## [2.3.1](https://github.com/akadenia/AkadeniaAzureStorage/compare/2.3.0...2.3.1) (2025-02-18)
+
+
+### Bug Fixes
+
+* **sas-url:** prevent double slashes from sas url ([d5358a4](https://github.com/akadenia/AkadeniaAzureStorage/commit/d5358a45637f207ac11eaf4e76e98000c86f71b2))
+
 # [2.3.0](https://github.com/akadenia/AkadeniaAzureStorage/compare/2.2.0...2.3.0) (2025-02-13)
 
 
