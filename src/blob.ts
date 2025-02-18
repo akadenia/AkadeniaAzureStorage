@@ -259,19 +259,20 @@ export class BlobStorage {
 
     const sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountKey)
     const sasQueryString = generateBlobSASQueryParameters(options, sharedKeyCredential).toString()
-    const baseUrl = blobService.url
-    const fullUrl = `${baseUrl}?${sasQueryString}`
 
-    let fullUrlWithSAS = `${baseUrl}/${containerName}`
-    if (blobName) {
-      fullUrlWithSAS += `/${blobName}`
-    }
-    fullUrlWithSAS += `?${sasQueryString}`
+    // Create base URL object
+    const baseUrl = new URL(blobService.url)
+    const fullUrl = new URL(`?${sasQueryString}`, baseUrl)
+
+    // Create full URL with container and blob
+    const fullUrlWithSAS = new URL(blobService.url)
+    fullUrlWithSAS.pathname = blobName ? `${containerName}/${blobName}` : containerName
+    fullUrlWithSAS.search = `?${sasQueryString}`
 
     return {
       sasQueryString,
-      fullUrl,
-      fullUrlWithSAS,
+      fullUrl: fullUrl.toString(),
+      fullUrlWithSAS: fullUrlWithSAS.toString(),
       containerName,
       blobName,
     }
