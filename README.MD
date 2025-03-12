@@ -1,4 +1,3 @@
-
 ## Installation
 ```
 npm install @akadenia/azure-storage --save
@@ -217,4 +216,3 @@ Deletes a table in the storage account
 
 ## License
 [MIT](https://github.com/akadenia/AkadeniaAzureStorage/blob/main/LICENSE)
-
