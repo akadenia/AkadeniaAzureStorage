@@ -531,7 +531,7 @@ npm test
 
 We follow [Conventional Commits](https://www.conventionalcommits.org/) for our semantic release process. **We prefer commit messages to include a scope in parentheses** for better categorization and changelog generation.
 
-#### Preferred Format
+### Preferred Format
 ```
 type(scope): description
 
@@ -540,22 +540,22 @@ type(scope): description
 [optional footer]
 ```
 
-#### Examples
+### Examples
 ```bash
-# ✅ Preferred - with scope
+## ✅ Preferred - with scope
 feat(blob): add new SAS URL generation options
 fix(table): resolve entity deletion issue
 docs(readme): add troubleshooting section
 chore(deps): update azure dependencies
 
-# ❌ Less preferred - without scope
+## ❌ Less preferred - without scope
 feat: add new SAS URL generation options
 fix: resolve entity deletion issue
 docs: add troubleshooting section
 chore: update azure dependencies
 ```
 
-#### Common Scopes
+### Common Scopes
 - `blob` - Blob Storage functionality
 - `table` - Table Storage functionality
 - `queue` - Queue Storage functionality
