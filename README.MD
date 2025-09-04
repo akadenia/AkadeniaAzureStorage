@@ -1,6 +1,16 @@
-# @akadenia/azure-storage
-
-A comprehensive TypeScript library providing simplified helper methods for Microsoft Azure Storage services including Blob Storage, Table Storage, and Queue Storage.
+<div align="center">
+  <img src="https://cdn.akadenia.com/images/akadenia-webp/logo/horizontal-logo.svg" alt="Akadenia" width="200" style="filter: drop-shadow(0 0 1px rgba(0,0,0,1)) drop-shadow(0 0 1px rgba(255,255,255,1));" />
+  
+  # @akadenia/azure-storage
+  
+  [![npm version](https://badge.fury.io/js/%40akadenia%2Fazure-storage.svg)](https://badge.fury.io/js/%40akadenia%2Fazure-storage)
+  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+  [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](http://www.typescriptlang.org/)
+  
+  A comprehensive TypeScript library providing simplified helper methods for Microsoft Azure Storage services including Blob Storage, Table Storage, and Queue Storage.
+  
+  [Documentation](https://akadenia.com/packages/akadenia-azure-storage) • [GitHub](https://github.com/akadenia/AkadeniaAzureStorage) • [Issues](https://github.com/akadenia/AkadeniaAzureStorage/issues)
+</div>
 
 ## Features
 
@@ -10,6 +20,20 @@ A comprehensive TypeScript library providing simplified helper methods for Micro
 - **TypeScript Support**: Full type definitions included
 - **SAS URL Support**: Generate and use Shared Access Signature URLs for secure access
 - **Error Handling**: Built-in error handling and validation
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Blob Storage](#blob-storage)
+- [Table Storage](#table-storage)
+- [Queue Storage](#queue-storage)
+- [Configuration](#configuration)
+- [Error Handling](#error-handling)
+- [Best Practices](#best-practices)
+- [API Reference](#api-reference)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Installation
 
@@ -491,7 +515,55 @@ for (const entity of entities) {
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+We welcome contributions! Please feel free to submit a Pull Request.
+
+### Development Setup
+
+```bash
+git clone https://github.com/akadenia/AkadeniaAzureStorage.git
+cd AkadeniaAzureStorage
+npm install
+npm run build
+npm test
+```
+
+### Commit Message Guidelines
+
+We follow [Conventional Commits](https://www.conventionalcommits.org/) for our semantic release process. **We prefer commit messages to include a scope in parentheses** for better categorization and changelog generation.
+
+#### Preferred Format
+```
+type(scope): description
+
+[optional body]
+
+[optional footer]
+```
+
+#### Examples
+```bash
+# ✅ Preferred - with scope
+feat(blob): add new SAS URL generation options
+fix(table): resolve entity deletion issue
+docs(readme): add troubleshooting section
+chore(deps): update azure dependencies
+
+# ❌ Less preferred - without scope
+feat: add new SAS URL generation options
+fix: resolve entity deletion issue
+docs: add troubleshooting section
+chore: update azure dependencies
+```
+
+#### Common Scopes
+- `blob` - Blob Storage functionality
+- `table` - Table Storage functionality
+- `queue` - Queue Storage functionality
+- `docs` - Documentation updates
+- `deps` - Dependency updates
+- `test` - Test-related changes
+- `build` - Build and build tooling
+- `ci` - CI/CD configuration
 
 ## Support
 
