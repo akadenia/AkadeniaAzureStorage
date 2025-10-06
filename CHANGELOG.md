@@ -1,3 +1,11 @@
+## [2.3.2](https://github.com/akadenia/AkadeniaAzureStorage/compare/2.3.1...2.3.2) (2025-10-06)
+
+
+### Bug Fixes
+
+* **security:** potential fix for code scanning alert no. 7: Workflow does not contain permissions ([ff82ff6](https://github.com/akadenia/AkadeniaAzureStorage/commit/ff82ff6bec3635ddd6f9e94a70604b83243bbb84))
+* **security:** potential fix for code scanning alert no. 7: workflow does not contain permissions ([#46](https://github.com/akadenia/AkadeniaAzureStorage/issues/46)) ([1b38a0e](https://github.com/akadenia/AkadeniaAzureStorage/commit/1b38a0eece2da770d90945e649a4e3c220cede45))
+
 ## [2.3.1](https://github.com/akadenia/AkadeniaAzureStorage/compare/2.3.0...2.3.1) (2025-02-18)
 
 
