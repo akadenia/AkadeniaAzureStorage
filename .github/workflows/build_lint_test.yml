@@ -36,3 +36,5 @@ jobs:
       - name: Run Azurite in Background
         shell: bash
         run: azurite-table &
+      - name: Run tests
+        run: npm run test:with-azurite

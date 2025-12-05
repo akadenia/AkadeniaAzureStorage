@@ -11,3 +11,6 @@ cache/
 vendor/
 
 README.hbs
+
+azurite-data/
+azurite-debug.log

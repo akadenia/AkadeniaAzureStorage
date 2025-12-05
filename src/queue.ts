@@ -1,4 +1,11 @@
 import { QueueClient } from "@azure/storage-queue"
+import { DefaultAzureCredential } from "@azure/identity"
+
+export interface QueueManagedIdentityOptions {
+  accountName: string
+  queueName: string
+  managedIdentityClientId?: string
+}
 
 /**
  * @class QueueStorage - A class that contains azure queue storage helpers
@@ -6,14 +13,30 @@ import { QueueClient } from "@azure/storage-queue"
 export class QueueStorage {
   private queueClient: QueueClient
 
-  constructor(connectionString: string, queueName: string) {
-    if (!connectionString) {
-      throw new Error("Missing connection string")
+  constructor(connectionString: string, queueName: string)
+  constructor(managedIdentityOptions: QueueManagedIdentityOptions)
+  constructor(connectionStringOrOptions: string | QueueManagedIdentityOptions, queueName?: string) {
+    if (typeof connectionStringOrOptions === "string") {
+      if (!connectionStringOrOptions) {
+        throw new Error("Missing connection string")
+      }
+      if (!queueName) {
+        throw new Error("Missing queue name")
+      }
+      this.queueClient = new QueueClient(connectionStringOrOptions, queueName)
+    } else {
+      if (!connectionStringOrOptions.accountName) {
+        throw new Error("Account name is required when using managed identity")
+      }
+      if (!connectionStringOrOptions.queueName) {
+        throw new Error("Queue name is required")
+      }
+      const accountUrl = `https://${connectionStringOrOptions.accountName}.queue.core.windows.net/${connectionStringOrOptions.queueName}`
+      const credential = new DefaultAzureCredential({
+        managedIdentityClientId: connectionStringOrOptions.managedIdentityClientId,
+      })
+      this.queueClient = new QueueClient(accountUrl, credential)
     }
-    if (!queueName) {
-      throw new Error("Missing queue name")
-    }
-    this.queueClient = new QueueClient(connectionString, queueName)
   }
 
   /**

@@ -17,6 +17,7 @@
 - **Blob Storage**: Upload, download, list, and manage blobs with SAS URL support
 - **Table Storage**: Complete CRUD operations for Azure Table Storage
 - **Queue Storage**: Send, receive, and manage queue messages
+- **Managed Identity Support**: Passwordless authentication using Azure Managed Identity
 - **TypeScript Support**: Full type definitions included
 - **SAS URL Support**: Generate and use Shared Access Signature URLs for secure access
 - **Error Handling**: Built-in error handling and validation
@@ -45,13 +46,21 @@ npm install @akadenia/azure-storage --save
 
 ### Prerequisites
 
-You'll need an Azure Storage Account connection string. You can get this from the Azure Portal under your storage account's "Access keys" section.
+You can authenticate using either:
+- **Connection String**: Get this from the Azure Portal under your storage account's "Access keys" section
+- **Managed Identity**: For applications running in Azure (recommended for production)
 
 ```typescript
 import { BlobStorage, TableStorage, QueueStorage } from '@akadenia/azure-storage';
 
-// Your Azure Storage connection string
+// Option 1: Using connection string
 const connectionString = "DefaultEndpointsProtocol=https;AccountName=yourstorageaccount;AccountKey=yourkey;EndpointSuffix=core.windows.net";
+const blobStorage = new BlobStorage(connectionString);
+
+// Option 2: Using managed identity (recommended for production)
+const blobStorage = new BlobStorage({
+  accountName: 'yourstorageaccount'
+});
 ```
 
 ## Blob Storage
@@ -385,6 +394,90 @@ const blobStorage = new BlobStorage(localConnectionString);
 const tableStorage = new TableStorage(localConnectionString, 'MyTable');
 const queueStorage = new QueueStorage(localConnectionString, 'my-queue');
 ```
+
+### Managed Identity Authentication
+
+For production environments, you can use Azure Managed Identity for passwordless authentication. This is the recommended approach for applications running in Azure.
+
+#### System-Assigned Managed Identity (Most Common)
+
+**System-assigned managed identity** is automatically created when you enable managed identity on your Azure resource (App Service, Function App, VM, etc.). You don't need to provide a client ID - Azure handles it automatically.
+
+```typescript
+import { BlobStorage, TableStorage, QueueStorage } from '@akadenia/azure-storage';
+
+// Blob Storage with system-assigned managed identity
+// No client ID needed - Azure automatically uses the identity assigned to your resource
+const blobStorage = new BlobStorage({
+  accountName: 'yourstorageaccount'
+});
+
+// Table Storage with system-assigned managed identity
+const tableStorage = new TableStorage({
+  accountName: 'yourstorageaccount',
+  tableName: 'MyTable'
+});
+
+// Queue Storage with system-assigned managed identity
+const queueStorage = new QueueStorage({
+  accountName: 'yourstorageaccount',
+  queueName: 'my-queue'
+});
+```
+
+#### User-Assigned Managed Identity (Advanced)
+
+**User-assigned managed identity** is a standalone Azure resource that you create separately. Use this when you want to share one identity across multiple Azure resources. You must provide the client ID of the user-assigned managed identity.
+
+```typescript
+// Blob Storage with user-assigned managed identity
+// Requires the client ID of the user-assigned managed identity
+const blobStorage = new BlobStorage({
+  accountName: 'yourstorageaccount',
+  managedIdentityClientId: 'your-client-id' // Required for user-assigned only
+});
+
+// Table Storage with user-assigned managed identity
+const tableStorage = new TableStorage({
+  accountName: 'yourstorageaccount',
+  tableName: 'MyTable',
+  managedIdentityClientId: 'your-client-id' // Required for user-assigned only
+});
+
+// Queue Storage with user-assigned managed identity
+const queueStorage = new QueueStorage({
+  accountName: 'yourstorageaccount',
+  queueName: 'my-queue',
+  managedIdentityClientId: 'your-client-id' // Required for user-assigned only
+});
+```
+
+#### Environment-Based Configuration
+
+```typescript
+// Use connection string in development, managed identity in production
+const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
+
+let blobStorage: BlobStorage;
+if (process.env.NODE_ENV === 'production') {
+  // Production: Use system-assigned managed identity (most common)
+  // Only provide managedIdentityClientId if using user-assigned managed identity
+  blobStorage = new BlobStorage({
+    accountName: accountName!,
+    // managedIdentityClientId: process.env.AZURE_CLIENT_ID // Only if using user-assigned
+  });
+} else {
+  // Development: Use connection string
+  blobStorage = new BlobStorage(process.env.AZURE_STORAGE_CONNECTION_STRING!);
+}
+```
+
+**Note:** When using managed identity, ensure your Azure resource (App Service, Function App, VM, etc.) has the appropriate role assignments:
+- **Storage Blob Data Contributor** for Blob Storage operations
+- **Storage Table Data Contributor** for Table Storage operations
+- **Storage Queue Data Contributor** for Queue Storage operations
+
+**Important:** SAS URL generation (`generateSASUrl`) requires connection string authentication and is not available when using managed identity.
 
 ## Error Handling
 
