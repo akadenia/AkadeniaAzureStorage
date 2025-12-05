@@ -17,7 +17,7 @@
     "test:with-azurite": "concurrently -k -s first -n \"AZURITE,JEST\" -c \"blue,magenta\" \"azurite --silent --location ./azurite-data\" \"sleep 2 && jest\"",
     "azurite": "azurite --silent --location ./azurite-data",
     "format": "prettier --write \"./**/*.{ts,tsx,js,jsx,json,yml}\"",
-    "lint": "prettier --check \"./**/*.{ts,tsx,js,jsx,json,yml}\"",
+    "lint": "prettier --check \"./**/*.{ts,tsx,js,jsx,json,yml}\" && tsc --noEmit",
     "prepare": "husky",
     "version": "git add -A src",
     "updateLink": "npm run build && npm rm @akadenia/azure-storage -g && npm link",

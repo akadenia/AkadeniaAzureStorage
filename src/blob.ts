@@ -285,7 +285,9 @@ export class BlobStorage {
     }
 
     if (this.useManagedIdentity) {
-      throw new Error("SAS URL generation is not supported with managed identity. Use connection string authentication for SAS generation.")
+      throw new Error(
+        "SAS URL generation is not supported with managed identity. Use connection string authentication for SAS generation.",
+      )
     }
 
     const parts = this.connectionStringOrSASUrl!.split(";")

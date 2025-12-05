@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, it, jest } from "@jest/globals"
+import { describe, expect, it, jest } from "@jest/globals"
 import { BlobStorage, TableStorage, QueueStorage } from "../src"
 
 // Mock @azure/identity
@@ -203,4 +203,3 @@ describe("Managed Identity Support", () => {
     })
   })
 })
-
