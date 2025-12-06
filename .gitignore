@@ -18,3 +18,4 @@ azurite-debug.log
 # Compiled JavaScript files (should only be in dist/)
 *.js
 !jest.config.js
+!commitlint.config.js
