@@ -9,6 +9,7 @@ import {
   HttpRequestBody,
   StorageSharedKeyCredential,
 } from "@azure/storage-blob"
+import { DefaultAzureCredential } from "@azure/identity"
 import { setLogLevel } from "@azure/logger"
 import { Readable } from "stream"
 
@@ -36,39 +37,73 @@ interface SASUrlComponents {
   fullUrlWithSAS: string
 }
 
+export interface ManagedIdentityOptions {
+  accountName: string
+  managedIdentityClientId?: string
+}
+
 /**
  * @class BlobStorage - A class that contains azure blob storage helpers
  */
 export class BlobStorage {
-  private connectionStringOrSASUrl: string
+  private connectionStringOrSASUrl?: string
+  private accountName?: string
+  private managedIdentityClientId?: string
+  private useManagedIdentity: boolean
 
-  constructor(connectionStringOrSASUrl: string) {
-    if (!connectionStringOrSASUrl) {
-      throw new Error("Connection string or SAS URL is required")
+  constructor(connectionStringOrSASUrl: string)
+  constructor(managedIdentityOptions: ManagedIdentityOptions)
+  constructor(connectionStringOrSASUrlOrOptions: string | ManagedIdentityOptions) {
+    if (typeof connectionStringOrSASUrlOrOptions === "string") {
+      if (!connectionStringOrSASUrlOrOptions) {
+        throw new Error("Connection string or SAS URL is required")
+      }
+      this.connectionStringOrSASUrl = connectionStringOrSASUrlOrOptions
+      this.useManagedIdentity = false
+    } else {
+      if (!connectionStringOrSASUrlOrOptions.accountName) {
+        throw new Error("Account name is required when using managed identity")
+      }
+      this.accountName = connectionStringOrSASUrlOrOptions.accountName
+      this.managedIdentityClientId = connectionStringOrSASUrlOrOptions.managedIdentityClientId
+      this.useManagedIdentity = true
     }
-    this.connectionStringOrSASUrl = connectionStringOrSASUrl
   }
 
   isEmulatorConnection() {
+    if (this.useManagedIdentity) {
+      return false
+    }
     return (
-      this.connectionStringOrSASUrl.includes("UseDevelopmentStorage=true") ||
-      this.connectionStringOrSASUrl.includes("devstoreaccount1")
+      this.connectionStringOrSASUrl!.includes("UseDevelopmentStorage=true") ||
+      this.connectionStringOrSASUrl!.includes("devstoreaccount1")
     )
   }
 
   isSASUrl() {
-    return this.connectionStringOrSASUrl.includes("?sv=") && this.connectionStringOrSASUrl.includes("sig=")
+    if (this.useManagedIdentity) {
+      return false
+    }
+    return this.connectionStringOrSASUrl!.includes("?sv=") && this.connectionStringOrSASUrl!.includes("sig=")
   }
 
   /**
    * @returns {BlobServiceClient} - A BlobServiceClient object
    */
   getBlobServiceUrl(): BlobServiceClient {
-    if (this.isSASUrl()) {
-      return new BlobServiceClient(this.connectionStringOrSASUrl)
+    if (this.useManagedIdentity) {
+      const accountUrl = `https://${this.accountName}.blob.core.windows.net`
+      const credential = new DefaultAzureCredential({
+        managedIdentityClientId: this.managedIdentityClientId,
+      })
+      return new BlobServiceClient(accountUrl, credential)
     }
 
-    return BlobServiceClient.fromConnectionString(this.connectionStringOrSASUrl)
+    if (this.isSASUrl()) {
+      return new BlobServiceClient(this.connectionStringOrSASUrl!)
+    }
+
+    return BlobServiceClient.fromConnectionString(this.connectionStringOrSASUrl!)
   }
 
   /**
@@ -249,7 +284,13 @@ export class BlobStorage {
       permissions: BlobSASPermissions.parse(permissions.join("")),
     }
 
-    const parts = this.connectionStringOrSASUrl.split(";")
+    if (this.useManagedIdentity) {
+      throw new Error(
+        "SAS URL generation is not supported with managed identity. Use connection string authentication for SAS generation.",
+      )
+    }
+
+    const parts = this.connectionStringOrSASUrl!.split(";")
     const accountName = parts.find((p) => p.startsWith("AccountName="))?.split("=")[1]
     const accountKey = parts.find((p) => p.startsWith("AccountKey="))?.split("=")[1]
 

@@ -1,10 +1,10 @@
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, jest } from "@jest/globals"
+import { afterAll, beforeAll, describe, expect, it } from "@jest/globals"
 
 import { BlobStorage, BlobPermissions, SASOptions } from "../src/blob"
+import { AZURITE_CONNECTION_STRING } from "./test-utils"
 
 describe("BlobStorage", () => {
-  const storageConnectionString =
-    "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;"
+  const storageConnectionString = process.env.TEST_AZURITE_CONNECTION_STRING || AZURITE_CONNECTION_STRING
 
   const blobClient = new BlobStorage(storageConnectionString)
 

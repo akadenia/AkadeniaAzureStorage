@@ -1,4 +1,5 @@
 import { GetTableEntityResponse, ListTableEntitiesOptions, TableClient, TableEntity, TableEntityResult } from "@azure/data-tables"
+import { DefaultAzureCredential } from "@azure/identity"
 
 /**
  * @interface ITableEntity - An interface that represents an entity in an azure table
@@ -20,22 +21,46 @@ export interface ITableEntity extends TableEntity {
   [key: string]: any
 }
 
+export interface TableManagedIdentityOptions {
+  accountName: string
+  tableName: string
+  managedIdentityClientId?: string
+}
+
 /**
  * @class TableStorage - A class that contains azure table storage helpers
  */
 export class TableStorage {
   private tableClient: TableClient
 
-  constructor(connectionString: string, tableName: string) {
-    if (!connectionString) {
-      throw new Error("Missing connection string")
-    }
+  constructor(connectionString: string, tableName: string)
+  constructor(managedIdentityOptions: TableManagedIdentityOptions)
+  constructor(connectionStringOrOptions: string | TableManagedIdentityOptions, tableName?: string) {
+    if (typeof connectionStringOrOptions === "string") {
+      if (!connectionStringOrOptions) {
+        throw new Error("Missing connection string")
+      }
 
-    if (!tableName) {
-      throw new Error("Missing table name")
-    }
+      if (!tableName) {
+        throw new Error("Missing table name")
+      }
 
-    this.tableClient = TableClient.fromConnectionString(connectionString, tableName)
+      this.tableClient = TableClient.fromConnectionString(connectionStringOrOptions, tableName)
+    } else {
+      if (!connectionStringOrOptions.accountName) {
+        throw new Error("Account name is required when using managed identity")
+      }
+
+      if (!connectionStringOrOptions.tableName) {
+        throw new Error("Table name is required")
+      }
+
+      const accountUrl = `https://${connectionStringOrOptions.accountName}.table.core.windows.net`
+      const credential = new DefaultAzureCredential({
+        managedIdentityClientId: connectionStringOrOptions.managedIdentityClientId,
+      })
+      this.tableClient = new TableClient(accountUrl, connectionStringOrOptions.tableName, credential)
+    }
   }
 
   /**
@@ -142,12 +167,8 @@ export class TableStorage {
   async list<T extends ITableEntity>(options?: ListTableEntitiesOptions): Promise<T[]> {
     const iterator = this.tableClient.listEntities<T>(options)
     let entities = []
-    let i = 1
     for await (const entity of iterator) {
       entities.push(entity)
-
-      this
-      i++
     }
 
     return entities
