@@ -1,5 +1,6 @@
 import { describe, expect, it, jest } from "@jest/globals"
 import { BlobStorage, TableStorage, QueueStorage } from "../src"
+import { AZURITE_BLOB_CONNECTION_STRING } from "./test-utils"
 
 // Mock @azure/identity
 jest.mock("@azure/identity", () => {
@@ -72,8 +73,7 @@ describe("Managed Identity Support", () => {
     })
 
     it("should maintain backward compatibility with connection string", () => {
-      const connectionString =
-        "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;"
+      const connectionString = process.env.TEST_AZURITE_CONNECTION_STRING || AZURITE_BLOB_CONNECTION_STRING
 
       const blobStorage = new BlobStorage(connectionString)
       expect(blobStorage).toBeDefined()
