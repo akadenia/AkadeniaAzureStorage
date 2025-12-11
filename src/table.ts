@@ -166,7 +166,8 @@ export class TableStorage {
 
   async list<T extends ITableEntity>(options?: ListTableEntitiesOptions): Promise<T[]> {
     const iterator = this.tableClient.listEntities<T>(options)
-    let entities = []
+    const entities: T[] = []
+
     for await (const entity of iterator) {
       entities.push(entity)
     }

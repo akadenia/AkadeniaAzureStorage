@@ -53,11 +53,12 @@ You can authenticate using either:
 ```typescript
 import { BlobStorage, TableStorage, QueueStorage } from '@akadenia/azure-storage';
 
-// Option 1: Using connection string
+// Option 1: Using connection string (required for Queue Storage)
 const connectionString = "DefaultEndpointsProtocol=https;AccountName=yourstorageaccount;AccountKey=yourkey;EndpointSuffix=core.windows.net";
 const blobStorage = new BlobStorage(connectionString);
+const queueStorage = new QueueStorage(connectionString); // Queue requires connection string
 
-// Option 2: Using managed identity (recommended for production)
+// Option 2: Using managed identity (recommended for production - Blob and Table only)
 const blobStorage = new BlobStorage({
   accountName: 'yourstorageaccount'
 });
@@ -313,59 +314,134 @@ const tableClient = tableStorage.getTableClient();
 
 The `QueueStorage` class provides methods to interact with Azure Queue Storage.
 
+**Important:** Queue Storage does not reliably support Managed Identity authentication. This class uses connection string authentication only.
+
 ### Basic Setup
 
 ```typescript
 import { QueueStorage } from '@akadenia/azure-storage';
 
-const queueStorage = new QueueStorage(connectionString, 'my-queue');
+// Queue Storage requires connection string authentication
+const queueStorage = new QueueStorage(connectionString);
 ```
 
 ### Message Operations
 
 ```typescript
-// Send a message
-const messageResult = await queueStorage.sendMessage('Hello, Queue Storage!');
-console.log('Message sent:', messageResult);
+// Send a string message (auto base64 encoded by default)
+const response = await queueStorage.sendMessage('my-queue', 'Hello, Queue Storage!');
+console.log('Message ID:', response.messageId);
 
-// Send JSON message
-const jsonMessage = JSON.stringify({
-  id: 123,
+// Send an object message (auto JSON stringified and base64 encoded)
+const orderMessage = {
+  orderNumber: '12345',
   action: 'process',
-  data: { name: 'John', age: 30 }
-});
-await queueStorage.sendMessage(jsonMessage);
+  timestamp: new Date().toISOString()
+};
+await queueStorage.sendMessage('my-queue', orderMessage);
 
-// Receive messages
-const messages = await queueStorage.receiveMessages();
-console.log('Received messages:', messages);
+// Send message without base64 encoding (if needed)
+await queueStorage.sendMessage('my-queue', 'Plain text message', false);
+
+// Receive messages from queue
+const receiveResponse = await queueStorage.receiveMessages('my-queue', 5, 30);
+console.log('Received:', receiveResponse.receivedMessageItems.length, 'messages');
 
 // Process and delete messages
-for (const message of messages) {
-  console.log('Processing message:', message.messageText);
+for (const message of receiveResponse.receivedMessageItems) {
+  // Decode base64 message
+  const decodedText = Buffer.from(message.messageText, 'base64').toString('utf-8');
+  const messageData = JSON.parse(decodedText);
   
-  // Process the message...
+  console.log('Processing order:', messageData.orderNumber);
   
-  // Delete the message after processing
-  await queueStorage.deleteMessage(message.messageId, message.popReceipt);
+  // Delete message after processing
+  await queueStorage.deleteMessage('my-queue', message.messageId, message.popReceipt);
+}
+```
+
+### Queue Management
+
+```typescript
+// Create a queue if it doesn't exist
+await queueStorage.createQueue('my-new-queue');
+
+// Check if queue exists
+const exists = await queueStorage.queueExists('my-queue');
+console.log('Queue exists:', exists);
+
+// Get approximate message count
+const messageCount = await queueStorage.getMessageCount('my-queue');
+console.log('Approximate messages in queue:', messageCount);
+
+// Clear all messages from queue
+await queueStorage.clearMessages('my-queue');
+
+// Delete a queue
+await queueStorage.deleteQueue('old-queue');
+```
+
+### Peek Messages (Without Removing)
+
+```typescript
+// Peek at messages without removing them from the queue
+const peekResponse = await queueStorage.peekMessages('my-queue', 5);
+for (const message of peekResponse.peekedMessageItems) {
+  console.log('Peeked message:', message.messageText);
 }
 ```
 
 ### Advanced Queue Examples
 
 ```typescript
-// Get queue client for advanced operations
-const queueClient = queueStorage.getQueueClient();
+// Get underlying QueueClient for advanced operations
+const queueClient = queueStorage.getQueueClient('my-queue');
 
-// Send message with options
-await queueClient.sendMessage('Delayed message', {
+// Use QueueClient directly for custom operations
+await queueClient.sendMessage('Custom message', {
   visibilityTimeoutInSeconds: 30, // Hide for 30 seconds
   timeToLiveInSeconds: 3600 // Expire after 1 hour
 });
 
-// Peek at messages without removing them
-const peekedMessages = await queueClient.peekMessages({ numberOfMessages: 5 });
-console.log('Peeked messages:', peekedMessages);
+// Integration example: Order processing pipeline
+class OrderProcessor {
+  private queueStorage: QueueStorage;
+  
+  constructor(connectionString: string) {
+    this.queueStorage = new QueueStorage(connectionString);
+  }
+  
+  async queueOrder(orderNumber: string): Promise<void> {
+    const message = { orderNumber, timestamp: Date.now() };
+    await this.queueStorage.sendMessage('orders-to-process', message);
+    console.log(`Order ${orderNumber} queued for processing`);
+  }
+  
+  async processOrders(): Promise<void> {
+    const response = await this.queueStorage.receiveMessages('orders-to-process', 10);
+    
+    for (const message of response.receivedMessageItems) {
+      try {
+        // Decode and parse message
+        const decoded = Buffer.from(message.messageText, 'base64').toString('utf-8');
+        const order = JSON.parse(decoded);
+        
+        // Process order...
+        console.log(`Processing order ${order.orderNumber}`);
+        
+        // Delete message after successful processing
+        await this.queueStorage.deleteMessage(
+          'orders-to-process',
+          message.messageId,
+          message.popReceipt
+        );
+      } catch (error) {
+        console.error('Failed to process message:', error);
+        // Message will become visible again after visibility timeout
+      }
+    }
+  }
+}
 ```
 
 
@@ -392,7 +468,7 @@ const localConnectionString = "UseDevelopmentStorage=true";
 
 const blobStorage = new BlobStorage(localConnectionString);
 const tableStorage = new TableStorage(localConnectionString, 'MyTable');
-const queueStorage = new QueueStorage(localConnectionString, 'my-queue');
+const queueStorage = new QueueStorage(localConnectionString);
 ```
 
 ### Managed Identity Authentication
@@ -418,11 +494,8 @@ const tableStorage = new TableStorage({
   tableName: 'MyTable'
 });
 
-// Queue Storage with system-assigned managed identity
-const queueStorage = new QueueStorage({
-  accountName: 'yourstorageaccount',
-  queueName: 'my-queue'
-});
+// Queue Storage - requires connection string (managed identity not supported)
+const queueStorage = new QueueStorage(process.env.AZURE_STORAGE_CONNECTION_STRING!);
 ```
 
 #### User-Assigned Managed Identity (Advanced)
@@ -444,12 +517,8 @@ const tableStorage = new TableStorage({
   managedIdentityClientId: 'your-client-id' // Required for user-assigned only
 });
 
-// Queue Storage with user-assigned managed identity
-const queueStorage = new QueueStorage({
-  accountName: 'yourstorageaccount',
-  queueName: 'my-queue',
-  managedIdentityClientId: 'your-client-id' // Required for user-assigned only
-});
+// Queue Storage - requires connection string (managed identity not supported)
+const queueStorage = new QueueStorage(process.env.AZURE_STORAGE_CONNECTION_STRING!);
 ```
 
 #### Environment-Based Configuration
@@ -475,9 +544,10 @@ if (process.env.NODE_ENV === 'production') {
 **Note:** When using managed identity, ensure your Azure resource (App Service, Function App, VM, etc.) has the appropriate role assignments:
 - **Storage Blob Data Contributor** for Blob Storage operations
 - **Storage Table Data Contributor** for Table Storage operations
-- **Storage Queue Data Contributor** for Queue Storage operations
 
-**Important:** SAS URL generation (`generateSASUrl`) requires connection string authentication and is not available when using managed identity.
+**Important Limitations:**
+- SAS URL generation (`generateSASUrl`) requires connection string authentication and is not available when using managed identity
+- **Queue Storage does not support managed identity** and requires connection string authentication
 
 ## Error Handling
 
@@ -597,9 +667,16 @@ for (const entity of entities) {
 
 | Method | Description | Returns |
 |--------|-------------|---------|
-| `sendMessage(message)` | Sends a message to the queue | `Promise<any>` |
-| `receiveMessages()` | Receives messages from the queue | `Promise<any>` |
-| `deleteMessage(messageId, popReceipt)` | Deletes a message | `Promise<void>` |
+| `getQueueClient(queueName)` | Gets a QueueClient for a specific queue | `QueueClient` |
+| `sendMessage(queueName, message, base64Encode?)` | Sends a message to the queue | `Promise<QueueSendMessageResponse>` |
+| `receiveMessages(queueName, maxMessages?, visibilityTimeout?)` | Receives messages from the queue | `Promise<any>` |
+| `deleteMessage(queueName, messageId, popReceipt)` | Deletes a message from the queue | `Promise<void>` |
+| `peekMessages(queueName, maxMessages?)` | Peeks messages without removing them | `Promise<any>` |
+| `clearMessages(queueName)` | Clears all messages from the queue | `Promise<void>` |
+| `createQueue(queueName)` | Creates a queue if it doesn't exist | `Promise<void>` |
+| `deleteQueue(queueName)` | Deletes a queue | `Promise<void>` |
+| `queueExists(queueName)` | Checks if a queue exists | `Promise<boolean>` |
+| `getMessageCount(queueName)` | Gets approximate message count | `Promise<number>` |
 
 
 ## License
