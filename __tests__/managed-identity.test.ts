@@ -1,5 +1,5 @@
 import { describe, expect, it, jest } from "@jest/globals"
-import { BlobStorage, TableStorage, QueueStorage } from "../src"
+import { BlobStorage, QueueStorage, TableStorage } from "../src"
 import { AZURITE_BLOB_CONNECTION_STRING } from "./test-utils"
 
 // Mock @azure/identity
@@ -131,45 +131,31 @@ describe("Managed Identity Support", () => {
     it("should create QueueStorage instance with system-assigned managed identity", () => {
       const queueStorage = new QueueStorage({
         accountName: "teststorageaccount",
-        queueName: "test-queue",
       })
 
       expect(queueStorage).toBeDefined()
-      const queueClient = queueStorage.getQueueClient()
-      expect(queueClient).toBeDefined()
     })
 
     it("should create QueueStorage instance with user-assigned managed identity", () => {
       const queueStorage = new QueueStorage({
         accountName: "teststorageaccount",
-        queueName: "test-queue",
         managedIdentityClientId: "client-id-123",
       })
 
       expect(queueStorage).toBeDefined()
-      const queueClient = queueStorage.getQueueClient()
-      expect(queueClient).toBeDefined()
     })
 
     it("should throw error when account name is missing", () => {
       expect(() => {
-        new QueueStorage({ accountName: "", queueName: "test-queue" } as any)
+        new QueueStorage({ accountName: "" } as any)
       }).toThrow("Account name is required when using managed identity")
-    })
-
-    it("should throw error when queue name is missing with managed identity", () => {
-      expect(() => {
-        new QueueStorage({ accountName: "teststorageaccount", queueName: "" } as any)
-      }).toThrow("Queue name is required")
     })
 
     it("should maintain backward compatibility with connection string", () => {
       const connectionString = "UseDevelopmentStorage=true"
-      const queueStorage = new QueueStorage(connectionString, "test-queue")
+      const queueStorage = new QueueStorage(connectionString)
 
       expect(queueStorage).toBeDefined()
-      const queueClient = queueStorage.getQueueClient()
-      expect(queueClient).toBeDefined()
     })
   })
 
@@ -195,10 +181,10 @@ describe("Managed Identity Support", () => {
 
     it("should correctly identify connection string vs managed identity for QueueStorage", () => {
       const connectionString = "UseDevelopmentStorage=true"
-      const queueStorage1 = new QueueStorage(connectionString, "queue1")
+      const queueStorage1 = new QueueStorage(connectionString)
       expect(queueStorage1).toBeDefined()
 
-      const queueStorage2 = new QueueStorage({ accountName: "test", queueName: "queue1" })
+      const queueStorage2 = new QueueStorage({ accountName: "test" })
       expect(queueStorage2).toBeDefined()
     })
   })
