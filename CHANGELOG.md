@@ -1,3 +1,11 @@
+# [2.4.0](https://github.com/akadenia/AkadeniaAzureStorage/compare/2.3.2...2.4.0) (2025-12-06)
+
+
+### Features
+
+* **managed-identity:** add managed identity support for Azure Storage services ([0a958f0](https://github.com/akadenia/AkadeniaAzureStorage/commit/0a958f03c6bd167210e23c525867ef44bc01d568))
+* **managed-identity:** add managed identity support for Azure Storage services ([#49](https://github.com/akadenia/AkadeniaAzureStorage/issues/49)) ([9b22e53](https://github.com/akadenia/AkadeniaAzureStorage/commit/9b22e532775a9fd89a7dcf572791f465ae7ddb31))
+
 ## [2.3.2](https://github.com/akadenia/AkadeniaAzureStorage/compare/2.3.1...2.3.2) (2025-10-06)
 
 
