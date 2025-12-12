@@ -53,13 +53,21 @@ You can authenticate using either:
 ```typescript
 import { BlobStorage, TableStorage, QueueStorage } from '@akadenia/azure-storage';
 
-// Option 1: Using connection string (required for Queue Storage)
+// Option 1: Using connection string
 const connectionString = "DefaultEndpointsProtocol=https;AccountName=yourstorageaccount;AccountKey=yourkey;EndpointSuffix=core.windows.net";
 const blobStorage = new BlobStorage(connectionString);
-const queueStorage = new QueueStorage(connectionString); // Queue requires connection string
+const tableStorage = new TableStorage(connectionString, 'tableName');
+const queueStorage = new QueueStorage(connectionString);
 
-// Option 2: Using managed identity (recommended for production - Blob and Table only)
+// Option 2: Using managed identity (recommended for production)
 const blobStorage = new BlobStorage({
+  accountName: 'yourstorageaccount'
+});
+const tableStorage = new TableStorage({
+  accountName: 'yourstorageaccount',
+  tableName: 'tableName'
+});
+const queueStorage = new QueueStorage({
   accountName: 'yourstorageaccount'
 });
 ```
@@ -314,15 +322,18 @@ const tableClient = tableStorage.getTableClient();
 
 The `QueueStorage` class provides methods to interact with Azure Queue Storage.
 
-**Important:** Queue Storage does not reliably support Managed Identity authentication. This class uses connection string authentication only.
-
 ### Basic Setup
 
 ```typescript
 import { QueueStorage } from '@akadenia/azure-storage';
 
-// Queue Storage requires connection string authentication
+// Using connection string
 const queueStorage = new QueueStorage(connectionString);
+
+// Using managed identity (recommended for production)
+const queueStorage = new QueueStorage({
+  accountName: 'yourstorageaccount'
+});
 ```
 
 ### Message Operations
@@ -494,8 +505,10 @@ const tableStorage = new TableStorage({
   tableName: 'MyTable'
 });
 
-// Queue Storage - requires connection string (managed identity not supported)
-const queueStorage = new QueueStorage(process.env.AZURE_STORAGE_CONNECTION_STRING!);
+// Queue Storage
+const queueStorage = new QueueStorage({
+  accountName: 'yourstorageaccount'
+});
 ```
 
 #### User-Assigned Managed Identity (Advanced)
@@ -517,8 +530,10 @@ const tableStorage = new TableStorage({
   managedIdentityClientId: 'your-client-id' // Required for user-assigned only
 });
 
-// Queue Storage - requires connection string (managed identity not supported)
-const queueStorage = new QueueStorage(process.env.AZURE_STORAGE_CONNECTION_STRING!);
+// Queue Storage
+const queueStorage = new QueueStorage({
+  accountName: 'yourstorageaccount'
+});
 ```
 
 #### Environment-Based Configuration
@@ -547,7 +562,6 @@ if (process.env.NODE_ENV === 'production') {
 
 **Important Limitations:**
 - SAS URL generation (`generateSASUrl`) requires connection string authentication and is not available when using managed identity
-- **Queue Storage does not support managed identity** and requires connection string authentication
 
 ## Error Handling
 

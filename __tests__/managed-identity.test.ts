@@ -1,5 +1,5 @@
 import { describe, expect, it, jest } from "@jest/globals"
-import { BlobStorage, TableStorage } from "../src"
+import { BlobStorage, QueueStorage, TableStorage } from "../src"
 import { AZURITE_BLOB_CONNECTION_STRING } from "./test-utils"
 
 // Mock @azure/identity
@@ -127,8 +127,37 @@ describe("Managed Identity Support", () => {
     })
   })
 
-  // QueueStorage tests removed - Queue Storage does not support managed identity
-  // See __tests__/queue.test.ts for Queue Storage tests using connection strings
+  describe("QueueStorage", () => {
+    it("should create QueueStorage instance with system-assigned managed identity", () => {
+      const queueStorage = new QueueStorage({
+        accountName: "teststorageaccount",
+      })
+
+      expect(queueStorage).toBeDefined()
+    })
+
+    it("should create QueueStorage instance with user-assigned managed identity", () => {
+      const queueStorage = new QueueStorage({
+        accountName: "teststorageaccount",
+        managedIdentityClientId: "client-id-123",
+      })
+
+      expect(queueStorage).toBeDefined()
+    })
+
+    it("should throw error when account name is missing", () => {
+      expect(() => {
+        new QueueStorage({ accountName: "" } as any)
+      }).toThrow("Account name is required when using managed identity")
+    })
+
+    it("should maintain backward compatibility with connection string", () => {
+      const connectionString = "UseDevelopmentStorage=true"
+      const queueStorage = new QueueStorage(connectionString)
+
+      expect(queueStorage).toBeDefined()
+    })
+  })
 
   describe("Constructor Overloads", () => {
     it("should correctly identify connection string vs managed identity for BlobStorage", () => {
@@ -150,6 +179,13 @@ describe("Managed Identity Support", () => {
       expect(tableStorage2).toBeDefined()
     })
 
-    // QueueStorage test removed - Queue Storage does not support managed identity
+    it("should correctly identify connection string vs managed identity for QueueStorage", () => {
+      const connectionString = "UseDevelopmentStorage=true"
+      const queueStorage1 = new QueueStorage(connectionString)
+      expect(queueStorage1).toBeDefined()
+
+      const queueStorage2 = new QueueStorage({ accountName: "test" })
+      expect(queueStorage2).toBeDefined()
+    })
   })
 })

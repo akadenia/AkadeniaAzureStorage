@@ -1,23 +1,37 @@
 import { QueueClient, QueueServiceClient, QueueSendMessageResponse } from "@azure/storage-queue"
+import { DefaultAzureCredential } from "@azure/identity"
+
+export interface QueueManagedIdentityOptions {
+  accountName: string
+  managedIdentityClientId?: string
+}
 
 /**
  * @class QueueStorage - A class that contains azure queue storage helpers
- * Note: Managed Identity is not reliably supported for Azure Queue Storage operations.
- * This class uses connection string authentication only.
+ * Supports both connection string and managed identity authentication
  */
 export class QueueStorage {
   private queueServiceClient: QueueServiceClient
 
-  /**
-   * Creates a QueueStorage instance using connection string authentication
-   * @param {string} connectionString - Azure Storage connection string
-   * @throws {Error} If connection string is missing or invalid
-   */
-  constructor(connectionString: string) {
-    if (!connectionString) {
-      throw new Error("Connection string is required for Queue Storage operations")
+  constructor(connectionString: string)
+  constructor(managedIdentityOptions: QueueManagedIdentityOptions)
+  constructor(connectionStringOrOptions: string | QueueManagedIdentityOptions) {
+    if (typeof connectionStringOrOptions === "string") {
+      if (!connectionStringOrOptions) {
+        throw new Error("Connection string is required for Queue Storage operations")
+      }
+      this.queueServiceClient = QueueServiceClient.fromConnectionString(connectionStringOrOptions)
+    } else {
+      if (!connectionStringOrOptions.accountName) {
+        throw new Error("Account name is required when using managed identity")
+      }
+
+      const accountUrl = `https://${connectionStringOrOptions.accountName}.queue.core.windows.net`
+      const credential = new DefaultAzureCredential({
+        managedIdentityClientId: connectionStringOrOptions.managedIdentityClientId,
+      })
+      this.queueServiceClient = new QueueServiceClient(accountUrl, credential)
     }
-    this.queueServiceClient = QueueServiceClient.fromConnectionString(connectionString)
   }
 
   /**
