@@ -31,10 +31,5 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm run lint
-      - name: Install & run Azurite
-        run: npm install -g azurite
-      - name: Run Azurite in Background
-        shell: bash
-        run: azurite &
       - name: Run tests
         run: npm run test:with-azurite
