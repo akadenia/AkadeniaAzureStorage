@@ -1,3 +1,10 @@
+# [2.5.0](https://github.com/akadenia/AkadeniaAzureStorage/compare/2.4.0...2.5.0) (2025-12-12)
+
+
+### Features
+
+* **queue:** expose more queue storage methods ([#51](https://github.com/akadenia/AkadeniaAzureStorage/issues/51)) ([8a29d36](https://github.com/akadenia/AkadeniaAzureStorage/commit/8a29d36b96049daee14bc4f2d5484185c6d1cc7c))
+
 # [2.4.0](https://github.com/akadenia/AkadeniaAzureStorage/compare/2.3.2...2.4.0) (2025-12-06)
 
 
