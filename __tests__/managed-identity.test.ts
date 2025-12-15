@@ -62,14 +62,41 @@ describe("Managed Identity Support", () => {
       expect(blobStorage.isSASUrl()).toBe(false)
     })
 
-    it("should throw error when generating SAS URL with managed identity", () => {
+    it("should generate User Delegation SAS URL with managed identity", async () => {
+      // Mock BlobServiceClient's getUserDelegationKey method
+      const mockUserDelegationKey = {
+        signedObjectId: "mock-object-id",
+        signedTenantId: "mock-tenant-id",
+        signedStartsOn: new Date(),
+        signedExpiresOn: new Date(Date.now() + 3600000),
+        signedService: "b",
+        signedVersion: "2020-06-12",
+        value: "mock-delegation-key",
+      }
+
       const blobStorage = new BlobStorage({
         accountName: "teststorageaccount",
       })
 
-      expect(() => {
-        blobStorage.generateSASUrl("container", "blob")
-      }).toThrow("SAS URL generation is not supported with managed identity")
+      // Spy on getBlobServiceUrl to return a mocked client
+      const blobServiceClient = blobStorage.getBlobServiceUrl()
+      // @ts-expect-error - Mock getUserDelegationKey
+      blobServiceClient.getUserDelegationKey = jest.fn().mockResolvedValue(mockUserDelegationKey)
+
+      // Spy on getBlobServiceUrl to return our mocked client
+      const getBlobServiceUrlSpy = jest.spyOn(blobStorage, "getBlobServiceUrl").mockReturnValue(blobServiceClient)
+
+      try {
+        // Should not throw - User Delegation SAS is now supported
+        const result = await blobStorage.generateSASUrl("container", "blob", {
+          permissions: [],
+        })
+        expect(result).toBeDefined()
+        expect(result.sasQueryString).toBeDefined()
+        expect(result.fullUrlWithSAS).toBeDefined()
+      } finally {
+        getBlobServiceUrlSpy.mockRestore()
+      }
     })
 
     it("should maintain backward compatibility with connection string", () => {

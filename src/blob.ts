@@ -257,17 +257,20 @@ export class BlobStorage {
   /**
    * * Generates a Shared Access Signature (SAS) URL for a blob or container
    *
+   * When using managed identity, this generates a User Delegation SAS (more secure, recommended).
+   * When using connection string, this generates a Service SAS.
+   *
    * @param {string} containerName - The name of the blob container
    * @param {string} [blobName] - Optional. The name of the specific blob. If not provided, the SAS token will be generated for the container level
    * @param {SASOptions} [sasOptions={}] - Optional. The options used for generating the SAS token
-   * @returns {SASUrlComponents} - Object containing:
+   * @returns {Promise<SASUrlComponents>} - Object containing:
    *   - fullUrlWithSAS: The complete URL with SAS token
    *   - fullUrl: The complete URL without SAS token
    *   - containerName: The name of the blob container
    *   - blobName: The name of the specific blob (if provided)
    *   - sasQueryString: The SAS token query parameters
    */
-  generateSASUrl(containerName: string, blobName?: string, sasOptions: SASOptions = {}): SASUrlComponents {
+  async generateSASUrl(containerName: string, blobName?: string, sasOptions: SASOptions = {}): Promise<SASUrlComponents> {
     const blobService = this.getBlobServiceUrl()
 
     const {
@@ -284,22 +287,30 @@ export class BlobStorage {
       permissions: BlobSASPermissions.parse(permissions.join("")),
     }
 
+    let sasQueryString: string
+
     if (this.useManagedIdentity) {
-      throw new Error(
-        "SAS URL generation is not supported with managed identity. Use connection string authentication for SAS generation.",
-      )
+      // Use User Delegation SAS (more secure)
+      // The delegation key expiry must be >= SAS token expiry
+      const delegationKeyExpiry = new Date(expiresOn.getTime() + 60 * 1000) // Add 1 minute buffer
+      const userDelegationKey = await blobService.getUserDelegationKey(startsOn, delegationKeyExpiry)
+
+      sasQueryString = generateBlobSASQueryParameters(options, userDelegationKey, this.accountName!).toString()
+    } else {
+      // Use Service SAS with account key
+      const parts = this.connectionStringOrSASUrl!.split(";")
+      const accountNamePart = parts.find((p) => p.startsWith("AccountName="))
+      const accountKeyPart = parts.find((p) => p.startsWith("AccountKey="))
+      const accountName = accountNamePart ? accountNamePart.slice(accountNamePart.indexOf("=") + 1) : undefined
+      const accountKey = accountKeyPart ? accountKeyPart.slice(accountKeyPart.indexOf("=") + 1) : undefined
+
+      if (!(accountName && accountKey)) {
+        throw new Error("Could not extract account name and account key from connection string")
+      }
+
+      const sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountKey)
+      sasQueryString = generateBlobSASQueryParameters(options, sharedKeyCredential).toString()
     }
-
-    const parts = this.connectionStringOrSASUrl!.split(";")
-    const accountName = parts.find((p) => p.startsWith("AccountName="))?.split("=")[1]
-    const accountKey = parts.find((p) => p.startsWith("AccountKey="))?.split("=")[1]
-
-    if (!(accountName && accountKey)) {
-      throw new Error("Could not extract account name and account key from connection string")
-    }
-
-    const sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountKey)
-    const sasQueryString = generateBlobSASQueryParameters(options, sharedKeyCredential).toString()
 
     // Create base URL object
     const baseUrl = new URL(blobService.url)
