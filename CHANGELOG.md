@@ -1,3 +1,10 @@
+# [2.6.0](https://github.com/akadenia/AkadeniaAzureStorage/compare/2.5.0...2.6.0) (2025-12-15)
+
+
+### Features
+
+* **blob:** enhance generateSASUrl with async support and User Delegation SAS ([#53](https://github.com/akadenia/AkadeniaAzureStorage/issues/53)) ([c8076c3](https://github.com/akadenia/AkadeniaAzureStorage/commit/c8076c351bcb8c933660a27381eb81cc877ece57))
+
 # [2.5.0](https://github.com/akadenia/AkadeniaAzureStorage/compare/2.4.0...2.5.0) (2025-12-12)
 
 
