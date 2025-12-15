@@ -164,6 +164,10 @@ console.log('Blob deleted:', deleted);
 
 ### SAS URL Generation
 
+The `generateSASUrl` method supports two types of SAS tokens:
+- **User Delegation SAS** (recommended): Used when authenticating with managed identity - more secure, no account keys required
+- **Service SAS**: Used when authenticating with connection string - uses account key
+
 ```typescript
 import { BlobPermissions } from '@akadenia/azure-storage';
 
@@ -174,7 +178,7 @@ const sasOptions = {
   permissions: [BlobPermissions.READ]
 };
 
-const sasUrl = blobStorage.generateSASUrl('my-container', 'my-blob.txt', sasOptions);
+const sasUrl = await blobStorage.generateSASUrl('my-container', 'my-blob.txt', sasOptions);
 console.log('SAS URL:', sasUrl.fullUrlWithSAS);
 
 // Use SAS URL for secure access
@@ -191,11 +195,27 @@ const containerSasOptions = {
   expiresOn: new Date(Date.now() + 24 * 3600 * 1000) // 24 hours
 };
 
-const containerSas = blobStorage.generateSASUrl('my-container', undefined, containerSasOptions);
+const containerSas = await blobStorage.generateSASUrl('my-container', undefined, containerSasOptions);
 const sasClient = new BlobStorage(containerSas.fullUrlWithSAS);
 
 // Upload using SAS URL
 await sasClient.uploadData('my-container', 'secure-upload.txt', Buffer.from('Secure content'));
+```
+
+### User Delegation SAS with Managed Identity
+
+When using managed identity, `generateSASUrl` automatically uses User Delegation SAS (more secure):
+
+```typescript
+// Using managed identity - generates User Delegation SAS
+const blobStorage = new BlobStorage({
+  accountName: 'mystorageaccount'
+});
+
+const sasUrl = await blobStorage.generateSASUrl('my-container', 'my-blob.txt', {
+  permissions: [BlobPermissions.WRITE],
+  expiresOn: new Date(Date.now() + 3600 * 1000)
+});
 ```
 
 
@@ -560,8 +580,10 @@ if (process.env.NODE_ENV === 'production') {
 - **Storage Blob Data Contributor** for Blob Storage operations
 - **Storage Table Data Contributor** for Table Storage operations
 
-**Important Limitations:**
-- SAS URL generation (`generateSASUrl`) requires connection string authentication and is not available when using managed identity
+**Important Notes:**
+- SAS URL generation (`generateSASUrl`) is now async and supports both:
+  - **User Delegation SAS** when using managed identity (recommended for production)
+  - **Service SAS** when using connection string authentication
 
 ## Error Handling
 
@@ -598,7 +620,7 @@ try {
 const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
 
 // Use SAS URLs for limited access
-const sasUrl = blobStorage.generateSASUrl('container', 'blob', {
+const sasUrl = await blobStorage.generateSASUrl('container', 'blob', {
   permissions: [BlobPermissions.READ],
   expiresOn: new Date(Date.now() + 3600 * 1000) // 1 hour
 });
@@ -662,7 +684,7 @@ for (const entity of entities) {
 | `blobExists(containerName, blobName)` | Checks if a blob exists | `Promise<boolean>` |
 | `listBlobs(containerName, prefix)` | Lists blobs with a prefix | `Promise<BlobItem[]>` |
 | `deleteBlob(containerName, blobName)` | Deletes a blob | `Promise<boolean>` |
-| `generateSASUrl(containerName, blobName?, options?)` | Generates a SAS URL | `SASUrlComponents` |
+| `generateSASUrl(containerName, blobName?, options?)` | Generates a SAS URL (User Delegation SAS with managed identity, Service SAS with connection string) | `Promise<SASUrlComponents>` |
 
 ### TableStorage
 

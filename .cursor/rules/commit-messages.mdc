@@ -1,0 +1,123 @@
+---
+description: Enforce semantic release commit message format with scopes
+alwaysApply: true
+---
+
+# Commit Message Standards
+
+## ALWAYS use Conventional Commits format with scope
+
+ALL commits MUST follow the format: `type(scope): description`
+
+## Line Length Limits
+
+**CRITICAL: All lines must be ≤ 100 characters - commitlint will FAIL if any line exceeds 100**
+
+- Header (subject line): ≤ 100 characters
+- Body lines: ≤ 100 characters each (including the "- " prefix for bullet points)
+- **ALWAYS count characters** - if a bullet point exceeds 100 chars, split it into multiple shorter bullets
+- Break long descriptions into multiple concise bullet points
+
+## CRITICAL: Code Changes Override Documentation
+
+**If both code and documentation changed, use the code change's type and scope.**
+- Code feature + README update = `feat(storage): ...` NOT `docs(readme): ...`
+- Code fix + README update = `fix(storage): ...` NOT `docs(readme): ...`
+- Only use `docs(readme)` when ONLY the README changed (no code, no tests)
+
+### Required Types
+- `feat`: New features
+- `fix`: Bug fixes
+- `docs`: Documentation changes
+- `style`: Code style changes (formatting, etc.)
+- `refactor`: Code refactoring
+- `test`: Adding or updating tests
+- `chore`: Maintenance tasks
+
+### Required Scopes (choose the most appropriate)
+- `readme`: README file changes
+- `api`: API changes (public method signatures, return types, etc.)
+- `helpers`: Helper function changes
+- `logger`: Logger changes
+- `storage`: Storage related changes (blob, queue, table implementations)
+- `build`: Build system changes (tsconfig, build scripts, etc.)
+- `deps`: Dependency changes
+
+### Examples
+- `feat(storage): add User Delegation SAS support for managed identity` (code + README = use storage scope)
+- `fix(storage): preserve base64 AccountKey values with padding in connection string parsing`
+- `docs(readme): update installation instructions` (ONLY docs, no code changes)
+- `test(storage): add tests for User Delegation SAS URLs`
+- `chore(deps): update @azure/storage-blob to latest version`
+- `refactor(api): simplify blob upload method signature`
+- `feat(storage): make generateSASUrl async with User Delegation SAS` (code change = feat, not docs)
+
+### When generating commits:
+1. **PRIORITY: Code changes override documentation changes**
+   - If code changes AND documentation changes exist, use the code change's type and scope
+   - README updates that accompany features/fixes should use the feature/fix scope, NOT `readme`
+2. Analyze the changes made to determine the appropriate type and scope
+3. Use the most specific scope that matches the PRIMARY change
+4. Write a clear, concise description in the imperative mood
+5. If multiple scopes are affected, choose the primary one (code > docs > tests)
+6. **CRITICAL: Keep ALL lines ≤ 100 characters**
+   - Count characters including the "- " prefix for bullet points
+   - If a bullet point is too long, split it into multiple shorter bullets
+   - Example: Instead of one long line, use 2-3 shorter lines
+7. Use concise bullet points in the body - prefer multiple short bullets over one long bullet
+
+### Type Selection Priority
+1. **`feat`**: New functionality added to code (new methods, new features, new capabilities)
+2. **`fix`**: Bug fixes in code
+3. **`refactor`**: Code restructuring without changing behavior
+4. **`test`**: Only if ONLY test files changed (no code changes)
+5. **`docs`**: ONLY if ONLY documentation changed (no code, no tests)
+6. **`chore`**: Build, dependencies, tooling changes
+
+### Scope Selection Guide (in priority order)
+1. **Code changes take precedence:**
+   - Changes to `src/blob.ts`, `src/queue.ts`, `src/table.ts` → `storage`
+   - Changes to `src/index.ts` exports → `api`
+   - Changes to helper functions → `helpers`
+   - Changes to logger → `logger`
+
+2. **Documentation scope is ONLY for pure docs:**
+   - Changes to README.MD → `readme` (ONLY if no code changed)
+   - If README changed WITH code changes → use the code's scope
+
+3. **Other scopes:**
+   - Changes to test files → `test` (with same scope as code being tested, or standalone if only tests)
+   - Changes to package.json dependencies → `chore(deps)`
+   - Changes to tsconfig.json, build scripts → `build`
+
+### Examples of Correct Scope Selection
+- ✅ Code change in `src/blob.ts` + README update → `feat(storage): ...` or `fix(storage): ...`
+- ✅ Only README changed → `docs(readme): ...`
+- ✅ Test file added for new feature → `test(storage): ...` (matches the feature scope)
+- ❌ Code feature + README → `docs(readme): ...` (WRONG - should be `feat(storage): ...`)
+
+### Example Commit with Body (all lines ≤ 100 chars)
+```
+feat(storage): add async User Delegation SAS support
+
+- Make generateSASUrl async for User Delegation SAS
+- Add User Delegation SAS support for managed identity
+- Update README with async examples
+- Add tests for User Delegation SAS URLs
+```
+
+### Example: Fixing Long Body Lines
+
+❌ **WRONG** (line exceeds 100 chars):
+```
+- Make generateSASUrl async to support both User Delegation SAS with managed identity and Service SAS with connection string.
+```
+
+✅ **CORRECT** (split into multiple short lines):
+```
+- Make generateSASUrl async for User Delegation SAS
+- Support both User Delegation SAS and Service SAS
+- Add managed identity support for User Delegation SAS
+```
+
+**Rule**: If a bullet point describes multiple things, split it into separate bullets. Each bullet should be concise and under 100 characters.
