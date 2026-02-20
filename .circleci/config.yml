@@ -1,0 +1,57 @@
+version: 2.1
+
+orbs:
+  node: circleci/node@6.1
+
+jobs:
+  build-lint-test:
+    docker:
+      - image: cimg/node:20.18
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Build
+          command: npm run build
+      - run:
+          name: Lint
+          command: npm run lint
+      - run:
+          name: Install Azurite
+          command: npm install -g azurite
+      - run:
+          name: Test (with Azurite)
+          command: npm run test:with-azurite
+
+  release:
+    docker:
+      - image: cimg/node:20.18
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Build
+          command: npm run build
+      - run:
+          name: Semantic Release
+          command: npx semantic-release
+
+workflows:
+  build-lint-test:
+    jobs:
+      - build-lint-test
+
+  release:
+    jobs:
+      - build-lint-test:
+          filters:
+            branches:
+              only: main
+      - release:
+          requires:
+            - build-lint-test
+          filters:
+            branches:
+              only: main
