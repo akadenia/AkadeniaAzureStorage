@@ -4,7 +4,7 @@ orbs:
   node: circleci/node@7.2.1
 
 jobs:
-  build_lint_test:
+  build_lint_test_node:
     parameters:
       node-version:
         type: string
@@ -21,6 +21,12 @@ jobs:
       - run:
           name: Run tests with Azurite
           command: npm run test:with-azurite
+
+  build_lint_test:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - run: echo "All node version tests passed"
 
   release:
     docker:
@@ -66,10 +72,13 @@ jobs:
 workflows:
   ci:
     jobs:
-      - build_lint_test:
+      - build_lint_test_node:
           matrix:
             parameters:
               node-version: ["20", "22", "24"]
+      - build_lint_test:
+          requires:
+            - build_lint_test_node
       - release:
           requires:
             - build_lint_test
