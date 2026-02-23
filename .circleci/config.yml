@@ -14,7 +14,9 @@ jobs:
           pkg-manager: npm
       - run: npm run build
       - run: npm run lint
-      - run: npm run test --if-present
+      - run:
+          name: Run tests with Azurite
+          command: npm run test:with-azurite
 
   release:
     docker:
