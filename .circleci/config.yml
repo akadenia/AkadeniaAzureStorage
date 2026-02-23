@@ -4,12 +4,16 @@ orbs:
   node: circleci/node@7.2.1
 
 jobs:
-  build_lint_test:
+  build_lint_test_node:
+    parameters:
+      node-version:
+        type: string
     docker:
       - image: cimg/base:current
     steps:
       - checkout
-      - node/install
+      - node/install:
+          node-version: << parameters.node-version >>
       - node/install-packages:
           pkg-manager: npm
       - run: npm run build
@@ -17,6 +21,12 @@ jobs:
       - run:
           name: Run tests with Azurite
           command: npm run test:with-azurite
+
+  build_lint_test:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - run: echo "All node version tests passed"
 
   release:
     docker:
@@ -26,7 +36,8 @@ jobs:
       HUSKY: "0"
     steps:
       - checkout
-      - node/install
+      - node/install:
+          node-version: "22"
       - node/install-packages:
           pkg-manager: npm
       - run: npm run build
@@ -61,7 +72,13 @@ jobs:
 workflows:
   ci:
     jobs:
-      - build_lint_test
+      - build_lint_test_node:
+          matrix:
+            parameters:
+              node-version: ["20", "22", "24"]
+      - build_lint_test:
+          requires:
+            - build_lint_test_node
       - release:
           requires:
             - build_lint_test

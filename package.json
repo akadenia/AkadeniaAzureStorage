@@ -14,8 +14,8 @@
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.json",
     "test": "jest",
-    "test:with-azurite": "concurrently -k -s first -n \"AZURITE,JEST\" -c \"blue,magenta\" \"azurite --silent --location ./azurite-data\" \"sleep 2 && jest\"",
-    "azurite": "azurite --silent --location ./azurite-data",
+    "test:with-azurite": "concurrently -k -s first -n \"AZURITE,JEST\" -c \"blue,magenta\" \"azurite --silent --skipApiVersionCheck --location ./azurite-data\" \"sleep 2 && jest\"",
+    "azurite": "azurite --silent --skipApiVersionCheck --location ./azurite-data",
     "format": "prettier --write \"./**/*.{ts,tsx,js,jsx,json,yml}\"",
     "lint": "prettier --check \"./**/*.{ts,tsx,js,jsx,json,yml}\" && tsc --noEmit",
     "prepare": "husky",
@@ -53,7 +53,7 @@
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/exec": "^7.1.0",
     "@types/jsdoc-to-markdown": "^7.0.6",
-    "@types/node": "^24.10.1",
+    "@types/node": "^22.x",
     "azurite": "^3.35.0",
     "concurrently": "^9.2.1",
     "husky": "^9.1.7",
@@ -65,5 +65,8 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "wait-on": "^9.0.3"
+  },
+  "engines": {
+    "node": ">=20.x"
   }
 }
