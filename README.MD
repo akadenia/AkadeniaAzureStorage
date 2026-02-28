@@ -1,7 +1,7 @@
 <div align="center">
   <img src="https://cdn.akadenia.com/images/akadenia-webp/logo/horizontal-logo.svg" alt="Akadenia" width="200" />
   
-  ## @akadenia/azure-storage
+  <h2><code>@akadenia/azure-storage</code></h2>
   
   <img src="https://cdn.akadenia.com/images/badges/npm-version-azure-storage.svg" alt="npm version" />
   <img src="https://cdn.akadenia.com/images/badges/license-mit.svg" alt="License: MIT" />
@@ -544,7 +544,7 @@ npm run test:with-azurite  # requires Azurite running locally
 
 We follow [Conventional Commits](https://www.conventionalcommits.org/). Scope is required.
 
-```
+```text
 type(scope): description
 ```
 
