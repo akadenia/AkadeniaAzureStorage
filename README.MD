@@ -1,15 +1,15 @@
 <div align="center">
   <img src="https://cdn.akadenia.com/images/akadenia-webp/logo/horizontal-logo.svg" alt="Akadenia" width="200" />
   
-  ## @akadenia/azure-storage
+  <h2><code>@akadenia/azure-storage</code></h2>
   
   <img src="https://cdn.akadenia.com/images/badges/npm-version-azure-storage.svg" alt="npm version" />
   <img src="https://cdn.akadenia.com/images/badges/license-mit.svg" alt="License: MIT" />
   <img src="https://cdn.akadenia.com/images/badges/typescript.svg" alt="TypeScript" />
   
-  A comprehensive TypeScript library providing simplified helper methods for Microsoft Azure Storage services including Blob Storage, Table Storage, and Queue Storage.
-  
-  [Documentation](https://akadenia.com/packages/akadenia-azure-storage) • [GitHub](https://github.com/akadenia/AkadeniaAzureStorage) • [Issues](https://github.com/akadenia/AkadeniaAzureStorage/issues)
+  A TypeScript library that wraps Azure Blob, Table, and Queue Storage with a clean, consistent API. Supports both connection strings and Managed Identity — so it works the same in local dev and production Azure environments.
+
+  [Documentation](https://akadenia.com/packages/akadenia-azure-storage) · [GitHub](https://github.com/akadenia/AkadeniaAzureStorage) · [Issues](https://github.com/akadenia/AkadeniaAzureStorage/issues)
 </div>
 
 ## Features
@@ -17,9 +17,9 @@
 - **Blob Storage**: Upload, download, list, and manage blobs with SAS URL support
 - **Table Storage**: Complete CRUD operations for Azure Table Storage
 - **Queue Storage**: Send, receive, and manage queue messages
-- **Managed Identity Support**: Passwordless authentication using Azure Managed Identity
+- **Managed Identity Support**: Passwordless authentication using Azure Managed Identity (system-assigned and user-assigned)
+- **SAS URL Support**: Generate Shared Access Signature URLs — User Delegation SAS with Managed Identity, Service SAS with connection strings
 - **TypeScript Support**: Full type definitions included
-- **SAS URL Support**: Generate and use Shared Access Signature URLs for secure access
 - **Error Handling**: Built-in error handling and validation
 
 ## Table of Contents
@@ -50,27 +50,29 @@ You can authenticate using either:
 - **Connection String**: Get this from the Azure Portal under your storage account's "Access keys" section
 - **Managed Identity**: For applications running in Azure (recommended for production)
 
+**Option 1: Connection string**
+
 ```typescript
 import { BlobStorage, TableStorage, QueueStorage } from '@akadenia/azure-storage';
 
-// Option 1: Using connection string
 const connectionString = "DefaultEndpointsProtocol=https;AccountName=yourstorageaccount;AccountKey=yourkey;EndpointSuffix=core.windows.net";
-const blobStorage = new BlobStorage(connectionString);
+
+const blobStorage  = new BlobStorage(connectionString);
 const tableStorage = new TableStorage(connectionString, 'tableName');
 const queueStorage = new QueueStorage(connectionString);
-
-// Option 2: Using managed identity (recommended for production)
-const blobStorage = new BlobStorage({
-  accountName: 'yourstorageaccount'
-});
-const tableStorage = new TableStorage({
-  accountName: 'yourstorageaccount',
-  tableName: 'tableName'
-});
-const queueStorage = new QueueStorage({
-  accountName: 'yourstorageaccount'
-});
 ```
+
+**Option 2: Managed Identity (recommended for production)**
+
+```typescript
+import { BlobStorage, TableStorage, QueueStorage } from '@akadenia/azure-storage';
+
+const blobStorage  = new BlobStorage({ accountName: 'yourstorageaccount' });
+const tableStorage = new TableStorage({ accountName: 'yourstorageaccount', tableName: 'tableName' });
+const queueStorage = new QueueStorage({ accountName: 'yourstorageaccount' });
+```
+
+---
 
 ## Blob Storage
 
@@ -101,35 +103,26 @@ console.log('Container deleted:', containerDeleted);
 ```typescript
 // Upload data from Buffer
 const data = Buffer.from('Hello, Azure Blob Storage!');
-const uploaded = await blobStorage.uploadData(
-  'my-container',
-  'my-blob.txt',
-  data,
-  { blobContentType: 'text/plain' }
-);
-console.log('Upload successful:', uploaded);
+const uploaded = await blobStorage.uploadData('my-container', 'my-blob.txt', data, {
+  blobContentType: 'text/plain'
+});
 
 // Upload from stream
 import { Readable } from 'stream';
 const stream = Readable.from(['Stream data content']);
-const streamUploaded = await blobStorage.uploadStream(
-  'my-container',
-  'stream-blob.txt',
-  stream,
-  { blobContentType: 'text/plain' }
-);
+await blobStorage.uploadStream('my-container', 'stream-blob.txt', stream, {
+  blobContentType: 'text/plain'
+});
 
-// Upload with custom headers
-const uploadedWithHeaders = await blobStorage.uploadData(
-  'my-container',
-  'document.pdf',
-  pdfBuffer,
-  {
-    blobContentType: 'application/pdf',
-    blobCacheControl: 'max-age=3600',
-    blobContentEncoding: 'gzip'
-  }
-);
+// Upload with additional headers
+await blobStorage.uploadData('my-container', 'document.pdf', pdfBuffer, {
+  blobContentType: 'application/pdf',
+  blobCacheControl: 'max-age=3600',
+  blobContentEncoding: 'gzip'
+});
+
+// Legacy upload method
+await blobStorage.upload('my-container', 'file.pdf', buffer, buffer.length, 'application/pdf');
 ```
 
 ### Download Operations
@@ -139,9 +132,11 @@ const uploadedWithHeaders = await blobStorage.uploadData(
 const blobData = await blobStorage.downloadBlob('my-container', 'my-blob.txt');
 console.log('Downloaded content:', blobData.toString());
 
-// Check if blob exists
+// Check if blob exists before downloading
 const exists = await blobStorage.blobExists('my-container', 'my-blob.txt');
-console.log('Blob exists:', exists);
+if (exists) {
+  const data = await blobStorage.downloadBlob('my-container', 'my-blob.txt');
+}
 ```
 
 ### List Operations
@@ -157,67 +152,47 @@ blobs.forEach(blob => {
 ### Delete Operations
 
 ```typescript
-// Delete a blob
 const deleted = await blobStorage.deleteBlob('my-container', 'my-blob.txt');
 console.log('Blob deleted:', deleted);
 ```
 
 ### SAS URL Generation
 
-The `generateSASUrl` method supports two types of SAS tokens:
-- **User Delegation SAS** (recommended): Used when authenticating with managed identity - more secure, no account keys required
-- **Service SAS**: Used when authenticating with connection string - uses account key
+`generateSASUrl` supports two SAS token types automatically:
+- **User Delegation SAS** — used with Managed Identity (more secure, no account keys)
+- **Service SAS** — used with connection string authentication
 
 ```typescript
 import { BlobPermissions } from '@akadenia/azure-storage';
 
-// Generate SAS URL for read access
-const sasOptions = {
+// Read-only SAS, 1 hour expiry
+const sasUrl = await blobStorage.generateSASUrl('my-container', 'my-blob.txt', {
   startsOn: new Date(),
-  expiresOn: new Date(Date.now() + 3600 * 1000), // 1 hour
+  expiresOn: new Date(Date.now() + 3600 * 1000),
   permissions: [BlobPermissions.READ]
-};
-
-const sasUrl = await blobStorage.generateSASUrl('my-container', 'my-blob.txt', sasOptions);
+});
 console.log('SAS URL:', sasUrl.fullUrlWithSAS);
 
-// Use SAS URL for secure access
-const sasBlobStorage = new BlobStorage(sasUrl.fullUrlWithSAS);
-const secureData = await sasBlobStorage.downloadBlob('my-container', 'my-blob.txt');
-```
-
-### Advanced SAS Examples
-
-```typescript
-// Generate container-level SAS with write permissions
-const containerSasOptions = {
+// Write-enabled container-level SAS
+const containerSas = await blobStorage.generateSASUrl('my-container', undefined, {
   permissions: [BlobPermissions.ADD, BlobPermissions.WRITE],
-  expiresOn: new Date(Date.now() + 24 * 3600 * 1000) // 24 hours
-};
-
-const containerSas = await blobStorage.generateSASUrl('my-container', undefined, containerSasOptions);
-const sasClient = new BlobStorage(containerSas.fullUrlWithSAS);
-
-// Upload using SAS URL
-await sasClient.uploadData('my-container', 'secure-upload.txt', Buffer.from('Secure content'));
+  expiresOn: new Date(Date.now() + 24 * 3600 * 1000)
+});
 ```
 
-### User Delegation SAS with Managed Identity
-
-When using managed identity, `generateSASUrl` automatically uses User Delegation SAS (more secure):
+#### SAS Permissions
 
 ```typescript
-// Using managed identity - generates User Delegation SAS
-const blobStorage = new BlobStorage({
-  accountName: 'mystorageaccount'
-});
+import { BlobPermissions } from '@akadenia/azure-storage';
 
-const sasUrl = await blobStorage.generateSASUrl('my-container', 'my-blob.txt', {
-  permissions: [BlobPermissions.WRITE],
-  expiresOn: new Date(Date.now() + 3600 * 1000)
-});
+BlobPermissions.READ    // "r"
+BlobPermissions.WRITE   // "w"
+BlobPermissions.CREATE  // "c"
+BlobPermissions.DELETE  // "d"
+BlobPermissions.ADD     // "a"
 ```
 
+---
 
 ## Table Storage
 
@@ -234,19 +209,13 @@ const tableStorage = new TableStorage(connectionString, 'MyTable');
 ### Table Management
 
 ```typescript
-// Create a table
 const tableCreated = await tableStorage.createTable();
-console.log('Table created:', tableCreated);
-
-// Delete a table
 const tableDeleted = await tableStorage.deleteTable();
-console.log('Table deleted:', tableDeleted);
 ```
 
 ### Entity Operations
 
 ```typescript
-// Define an entity
 interface UserEntity extends ITableEntity {
   partitionKey: string;
   rowKey: string;
@@ -256,7 +225,7 @@ interface UserEntity extends ITableEntity {
   isActive: boolean;
 }
 
-// Insert an entity
+// Insert
 const user: UserEntity = {
   partitionKey: 'users',
   rowKey: 'user-123',
@@ -265,36 +234,20 @@ const user: UserEntity = {
   age: 30,
   isActive: true
 };
+await tableStorage.insert(user);
 
-const inserted = await tableStorage.insert(user);
-console.log('User inserted:', inserted);
-
-// Get an entity
+// Get
 const retrievedUser = await tableStorage.get('users', 'user-123');
-console.log('Retrieved user:', retrievedUser);
 
-// Update an entity
+// Update
 user.age = 31;
-user.name = 'John Smith';
-const updated = await tableStorage.update(user);
-console.log('User updated:', updated);
+await tableStorage.update(user);
 
-// Upsert an entity (insert or update)
-const newUser: UserEntity = {
-  partitionKey: 'users',
-  rowKey: 'user-456',
-  name: 'Jane Doe',
-  email: 'jane@example.com',
-  age: 25,
-  isActive: true
-};
+// Upsert (insert or update)
+await tableStorage.upsert(newUser);
 
-const upserted = await tableStorage.upsert(newUser);
-console.log('User upserted:', upserted);
-
-// Delete an entity
-const deleted = await tableStorage.delete('users', 'user-123');
-console.log('User deleted:', deleted);
+// Delete
+await tableStorage.delete('users', 'user-123');
 ```
 
 ### List Operations
@@ -302,41 +255,17 @@ console.log('User deleted:', deleted);
 ```typescript
 // List all entities
 const allUsers = await tableStorage.list<UserEntity>();
-console.log('All users:', allUsers);
 
-// List with options
-const usersWithOptions = await tableStorage.list<UserEntity>({
-  queryOptions: { filter: "age gt 25" }
-});
-console.log('Users over 25:', usersWithOptions);
-```
-
-### Advanced Table Examples
-
-```typescript
-// Batch operations example
-const users = [
-  { partitionKey: 'users', rowKey: 'user-1', name: 'Alice', age: 28 },
-  { partitionKey: 'users', rowKey: 'user-2', name: 'Bob', age: 32 },
-  { partitionKey: 'users', rowKey: 'user-3', name: 'Charlie', age: 24 }
-];
-
-// Insert multiple users
-for (const user of users) {
-  await tableStorage.insert(user);
-}
-
-// Query with filters
-const youngUsers = await tableStorage.list<UserEntity>({
-  queryOptions: { filter: "age lt 30" }
+// List with filter
+const activeUsers = await tableStorage.list<UserEntity>({
+  queryOptions: { filter: "isActive eq true and age gt 25" }
 });
 
-// Get table client for advanced operations
+// Access underlying TableClient for advanced operations
 const tableClient = tableStorage.getTableClient();
-// Use tableClient for more complex operations
 ```
 
-
+---
 
 ## Queue Storage
 
@@ -347,125 +276,80 @@ The `QueueStorage` class provides methods to interact with Azure Queue Storage.
 ```typescript
 import { QueueStorage } from '@akadenia/azure-storage';
 
-// Using connection string
 const queueStorage = new QueueStorage(connectionString);
-
-// Using managed identity (recommended for production)
-const queueStorage = new QueueStorage({
-  accountName: 'yourstorageaccount'
-});
+// or with Managed Identity:
+const queueStorage = new QueueStorage({ accountName: 'yourstorageaccount' });
 ```
 
 ### Message Operations
 
 ```typescript
-// Send a string message (auto base64 encoded by default)
-const response = await queueStorage.sendMessage('my-queue', 'Hello, Queue Storage!');
-console.log('Message ID:', response.messageId);
+// Send a string message (base64 encoded by default)
+await queueStorage.sendMessage('my-queue', 'Hello, Queue!');
 
-// Send an object message (auto JSON stringified and base64 encoded)
-const orderMessage = {
-  orderNumber: '12345',
-  action: 'process',
-  timestamp: new Date().toISOString()
-};
-await queueStorage.sendMessage('my-queue', orderMessage);
+// Send an object (auto JSON stringified + base64 encoded)
+await queueStorage.sendMessage('my-queue', { orderNumber: '12345', action: 'process' });
 
-// Send message without base64 encoding (if needed)
-await queueStorage.sendMessage('my-queue', 'Plain text message', false);
+// Send without base64 encoding
+await queueStorage.sendMessage('my-queue', 'plain text', false);
 
-// Receive messages from queue
-const receiveResponse = await queueStorage.receiveMessages('my-queue', 5, 30);
-console.log('Received:', receiveResponse.receivedMessageItems.length, 'messages');
+// Receive messages
+const { receivedMessageItems } = await queueStorage.receiveMessages('my-queue', 5, 30);
 
-// Process and delete messages
-for (const message of receiveResponse.receivedMessageItems) {
-  // Decode base64 message
-  const decodedText = Buffer.from(message.messageText, 'base64').toString('utf-8');
-  const messageData = JSON.parse(decodedText);
-  
-  console.log('Processing order:', messageData.orderNumber);
-  
-  // Delete message after processing
+// Process and delete
+for (const message of receivedMessageItems) {
+  const decoded = Buffer.from(message.messageText, 'base64').toString('utf-8');
+  const data = JSON.parse(decoded);
+  // ... process data ...
   await queueStorage.deleteMessage('my-queue', message.messageId, message.popReceipt);
 }
+
+// Peek without consuming
+const { peekedMessageItems } = await queueStorage.peekMessages('my-queue', 5);
 ```
 
 ### Queue Management
 
 ```typescript
-// Create a queue if it doesn't exist
 await queueStorage.createQueue('my-new-queue');
 
-// Check if queue exists
 const exists = await queueStorage.queueExists('my-queue');
-console.log('Queue exists:', exists);
+const count  = await queueStorage.getMessageCount('my-queue');
 
-// Get approximate message count
-const messageCount = await queueStorage.getMessageCount('my-queue');
-console.log('Approximate messages in queue:', messageCount);
-
-// Clear all messages from queue
 await queueStorage.clearMessages('my-queue');
-
-// Delete a queue
 await queueStorage.deleteQueue('old-queue');
-```
 
-### Peek Messages (Without Removing)
-
-```typescript
-// Peek at messages without removing them from the queue
-const peekResponse = await queueStorage.peekMessages('my-queue', 5);
-for (const message of peekResponse.peekedMessageItems) {
-  console.log('Peeked message:', message.messageText);
-}
-```
-
-### Advanced Queue Examples
-
-```typescript
-// Get underlying QueueClient for advanced operations
+// Access underlying QueueClient for advanced options
 const queueClient = queueStorage.getQueueClient('my-queue');
-
-// Use QueueClient directly for custom operations
-await queueClient.sendMessage('Custom message', {
-  visibilityTimeoutInSeconds: 30, // Hide for 30 seconds
-  timeToLiveInSeconds: 3600 // Expire after 1 hour
+await queueClient.sendMessage('Custom', {
+  visibilityTimeoutInSeconds: 30,
+  timeToLiveInSeconds: 3600
 });
+```
 
-// Integration example: Order processing pipeline
+### Integration Example: Order Processing Pipeline
+
+```typescript
 class OrderProcessor {
   private queueStorage: QueueStorage;
-  
+
   constructor(connectionString: string) {
     this.queueStorage = new QueueStorage(connectionString);
   }
-  
+
   async queueOrder(orderNumber: string): Promise<void> {
-    const message = { orderNumber, timestamp: Date.now() };
-    await this.queueStorage.sendMessage('orders-to-process', message);
-    console.log(`Order ${orderNumber} queued for processing`);
+    await this.queueStorage.sendMessage('orders-to-process', { orderNumber, timestamp: Date.now() });
   }
-  
+
   async processOrders(): Promise<void> {
-    const response = await this.queueStorage.receiveMessages('orders-to-process', 10);
-    
-    for (const message of response.receivedMessageItems) {
+    const { receivedMessageItems } = await this.queueStorage.receiveMessages('orders-to-process', 10);
+
+    for (const message of receivedMessageItems) {
       try {
-        // Decode and parse message
         const decoded = Buffer.from(message.messageText, 'base64').toString('utf-8');
         const order = JSON.parse(decoded);
-        
-        // Process order...
         console.log(`Processing order ${order.orderNumber}`);
-        
-        // Delete message after successful processing
-        await this.queueStorage.deleteMessage(
-          'orders-to-process',
-          message.messageId,
-          message.popReceipt
-        );
+        await this.queueStorage.deleteMessage('orders-to-process', message.messageId, message.popReceipt);
       } catch (error) {
         console.error('Failed to process message:', error);
         // Message will become visible again after visibility timeout
@@ -475,123 +359,68 @@ class OrderProcessor {
 }
 ```
 
+---
 
 ## Configuration
 
 ### Environment Variables
 
 ```typescript
-// Use environment variables for connection string
 const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-
-if (!connectionString) {
-  throw new Error('AZURE_STORAGE_CONNECTION_STRING environment variable is required');
-}
+if (!connectionString) throw new Error('AZURE_STORAGE_CONNECTION_STRING is required');
 ```
 
 ### Local Development with Azurite
 
-For local development, you can use Azurite (Azure Storage Emulator):
-
 ```typescript
-// Azurite connection string
-const localConnectionString = "UseDevelopmentStorage=true";
-
-const blobStorage = new BlobStorage(localConnectionString);
-const tableStorage = new TableStorage(localConnectionString, 'MyTable');
-const queueStorage = new QueueStorage(localConnectionString);
+const blobStorage  = new BlobStorage("UseDevelopmentStorage=true");
+const tableStorage = new TableStorage("UseDevelopmentStorage=true", 'MyTable');
+const queueStorage = new QueueStorage("UseDevelopmentStorage=true");
 ```
 
 ### Managed Identity Authentication
 
-For production environments, you can use Azure Managed Identity for passwordless authentication. This is the recommended approach for applications running in Azure.
+#### System-Assigned (Most Common)
 
-#### System-Assigned Managed Identity (Most Common)
-
-**System-assigned managed identity** is automatically created when you enable managed identity on your Azure resource (App Service, Function App, VM, etc.). You don't need to provide a client ID - Azure handles it automatically.
+Automatically created when you enable managed identity on your Azure resource — no client ID needed.
 
 ```typescript
-import { BlobStorage, TableStorage, QueueStorage } from '@akadenia/azure-storage';
-
-// Blob Storage with system-assigned managed identity
-// No client ID needed - Azure automatically uses the identity assigned to your resource
-const blobStorage = new BlobStorage({
-  accountName: 'yourstorageaccount'
-});
-
-// Table Storage with system-assigned managed identity
-const tableStorage = new TableStorage({
-  accountName: 'yourstorageaccount',
-  tableName: 'MyTable'
-});
-
-// Queue Storage
-const queueStorage = new QueueStorage({
-  accountName: 'yourstorageaccount'
-});
+const blobStorage  = new BlobStorage({ accountName: 'yourstorageaccount' });
+const tableStorage = new TableStorage({ accountName: 'yourstorageaccount', tableName: 'MyTable' });
+const queueStorage = new QueueStorage({ accountName: 'yourstorageaccount' });
 ```
 
-#### User-Assigned Managed Identity (Advanced)
+#### User-Assigned
 
-**User-assigned managed identity** is a standalone Azure resource that you create separately. Use this when you want to share one identity across multiple Azure resources. You must provide the client ID of the user-assigned managed identity.
+A standalone identity shared across multiple Azure resources. Requires the client ID.
 
 ```typescript
-// Blob Storage with user-assigned managed identity
-// Requires the client ID of the user-assigned managed identity
 const blobStorage = new BlobStorage({
   accountName: 'yourstorageaccount',
-  managedIdentityClientId: 'your-client-id' // Required for user-assigned only
-});
-
-// Table Storage with user-assigned managed identity
-const tableStorage = new TableStorage({
-  accountName: 'yourstorageaccount',
-  tableName: 'MyTable',
-  managedIdentityClientId: 'your-client-id' // Required for user-assigned only
-});
-
-// Queue Storage
-const queueStorage = new QueueStorage({
-  accountName: 'yourstorageaccount'
+  managedIdentityClientId: 'your-client-id'
 });
 ```
 
 #### Environment-Based Configuration
 
 ```typescript
-// Use connection string in development, managed identity in production
-const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
-
-let blobStorage: BlobStorage;
-if (process.env.NODE_ENV === 'production') {
-  // Production: Use system-assigned managed identity (most common)
-  // Only provide managedIdentityClientId if using user-assigned managed identity
-  blobStorage = new BlobStorage({
-    accountName: accountName!,
-    // managedIdentityClientId: process.env.AZURE_CLIENT_ID // Only if using user-assigned
-  });
-} else {
-  // Development: Use connection string
-  blobStorage = new BlobStorage(process.env.AZURE_STORAGE_CONNECTION_STRING!);
-}
+const blobStorage = process.env.NODE_ENV === 'production'
+  ? new BlobStorage({ accountName: process.env.AZURE_STORAGE_ACCOUNT_NAME! })
+  : new BlobStorage(process.env.AZURE_STORAGE_CONNECTION_STRING!);
 ```
 
-**Note:** When using managed identity, ensure your Azure resource (App Service, Function App, VM, etc.) has the appropriate role assignments:
-- **Storage Blob Data Contributor** for Blob Storage operations
-- **Storage Table Data Contributor** for Table Storage operations
+> **Note:** When using Managed Identity, ensure your Azure resource has the appropriate role assignments:
+> - **Storage Blob Data Contributor** for Blob Storage
+> - **Storage Table Data Contributor** for Table Storage
+> - **Storage Queue Data Contributor** for Queue Storage
 
-**Important Notes:**
-- SAS URL generation (`generateSASUrl`) is now async and supports both:
-  - **User Delegation SAS** when using managed identity (recommended for production)
-  - **Service SAS** when using connection string authentication
+---
 
 ## Error Handling
 
-The library includes built-in error handling:
-
 ```typescript
 try {
-  const blobData = await blobStorage.downloadBlob('container', 'non-existent-blob.txt');
+  const blobData = await blobStorage.downloadBlob('container', 'non-existent.txt');
 } catch (error) {
   if (error.statusCode === 404) {
     console.log('Blob not found');
@@ -599,52 +428,45 @@ try {
     console.error('Error downloading blob:', error);
   }
 }
-
-try {
-  const user = await tableStorage.get('users', 'non-existent-user');
-} catch (error) {
-  if (error.statusCode === 404) {
-    console.log('User not found');
-  } else {
-    console.error('Error retrieving user:', error);
-  }
-}
 ```
+
+---
 
 ## Best Practices
 
-### 1. Connection String Security
+### 1. Use Managed Identity in Production
 
 ```typescript
-// Store connection strings securely
-const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
+const blobStorage = process.env.NODE_ENV === 'production'
+  ? new BlobStorage({ accountName: process.env.AZURE_STORAGE_ACCOUNT_NAME! })
+  : new BlobStorage(process.env.AZURE_STORAGE_CONNECTION_STRING!);
+```
 
-// Use SAS URLs for limited access
+### 2. Short-Lived SAS URLs
+
+```typescript
 const sasUrl = await blobStorage.generateSASUrl('container', 'blob', {
   permissions: [BlobPermissions.READ],
-  expiresOn: new Date(Date.now() + 3600 * 1000) // 1 hour
+  expiresOn: new Date(Date.now() + 3600 * 1000) // 1 hour max
 });
 ```
 
-### 2. Error Handling
+### 3. Always Handle Errors
 
 ```typescript
-// Always handle errors appropriately
-async function safeBlobOperation() {
+async function safeUpload(container: string, name: string, data: Buffer) {
   try {
-    const result = await blobStorage.uploadData('container', 'blob', data);
-    return result;
+    return await blobStorage.uploadData(container, name, data);
   } catch (error) {
-    console.error('Blob operation failed:', error);
+    console.error('Upload failed:', error);
     throw error;
   }
 }
 ```
 
-### 3. Resource Management
+### 4. Clean Up Temporary Resources
 
 ```typescript
-// Clean up resources when done
 async function cleanup() {
   try {
     await blobStorage.deleteContainer('temp-container');
@@ -655,69 +477,55 @@ async function cleanup() {
 }
 ```
 
-### 4. Performance Optimization
-
-```typescript
-// Use appropriate buffer sizes for large files
-await blobStorage.uploadStream('container', 'large-file.zip', stream, {
-  blobContentType: 'application/zip'
-}, 4 * 1024 * 1024); // 4MB buffer size
-
-// Batch table operations when possible
-const entities = [/* multiple entities */];
-for (const entity of entities) {
-  await tableStorage.upsert(entity);
-}
-```
+---
 
 ## API Reference
 
 ### BlobStorage
 
 | Method | Description | Returns |
-|--------|-------------|---------|
+|---|---|---|
 | `createContainer(containerName)` | Creates a container if it doesn't exist | `Promise<boolean>` |
-| `deleteContainer(containerName)` | Deletes a container if it exists | `Promise<boolean>` |
-| `uploadData(containerName, blobName, data, headers?)` | Uploads data to a blob | `Promise<boolean>` |
-| `uploadStream(containerName, blobName, stream, headers?)` | Uploads a stream to a blob | `Promise<boolean>` |
-| `downloadBlob(containerName, blobName)` | Downloads a blob as Buffer | `Promise<Buffer>` |
-| `blobExists(containerName, blobName)` | Checks if a blob exists | `Promise<boolean>` |
-| `listBlobs(containerName, prefix)` | Lists blobs with a prefix | `Promise<BlobItem[]>` |
-| `deleteBlob(containerName, blobName)` | Deletes a blob | `Promise<boolean>` |
-| `generateSASUrl(containerName, blobName?, options?)` | Generates a SAS URL (User Delegation SAS with managed identity, Service SAS with connection string) | `Promise<SASUrlComponents>` |
+| `deleteContainer(containerName)` | Deletes a container | `Promise<boolean>` |
+| `upload(container, blob, buffer, length, contentType)` | Uploads a buffer (legacy) | `Promise<boolean>` |
+| `uploadData(container, blob, data, headers?)` | Uploads a Buffer with optional headers | `Promise<boolean>` |
+| `uploadStream(container, blob, stream, headers?)` | Uploads a readable stream | `Promise<boolean>` |
+| `downloadBlob(container, blob)` | Downloads a blob as Buffer | `Promise<Buffer>` |
+| `blobExists(container, blob)` | Checks if a blob exists | `Promise<boolean>` |
+| `listBlobs(container, prefix)` | Lists blobs with a prefix | `Promise<BlobItem[]>` |
+| `deleteBlob(container, blob)` | Deletes a blob | `Promise<boolean>` |
+| `generateSASUrl(container, blob?, options?)` | Generates a SAS URL | `Promise<SASUrlComponents>` |
 
 ### TableStorage
 
 | Method | Description | Returns |
-|--------|-------------|---------|
-| `createTable()` | Creates a table | `Promise<boolean>` |
-| `deleteTable()` | Deletes a table | `Promise<boolean>` |
+|---|---|---|
+| `createTable()` | Creates the table | `Promise<boolean>` |
+| `deleteTable()` | Deletes the table | `Promise<boolean>` |
 | `insert(entity)` | Inserts an entity | `Promise<boolean>` |
 | `update(entity)` | Updates an entity | `Promise<boolean>` |
 | `upsert(entity)` | Inserts or updates an entity | `Promise<boolean>` |
 | `get(partitionKey, rowKey)` | Gets an entity | `Promise<GetTableEntityResponse>` |
 | `delete(partitionKey, rowKey)` | Deletes an entity | `Promise<boolean>` |
-| `list(options?)` | Lists entities | `Promise<T[]>` |
+| `list(options?)` | Lists entities with optional filter | `Promise<T[]>` |
+| `getTableClient()` | Returns the underlying TableClient | `TableClient` |
 
 ### QueueStorage
 
 | Method | Description | Returns |
-|--------|-------------|---------|
-| `getQueueClient(queueName)` | Gets a QueueClient for a specific queue | `QueueClient` |
-| `sendMessage(queueName, message, base64Encode?)` | Sends a message to the queue | `Promise<QueueSendMessageResponse>` |
-| `receiveMessages(queueName, maxMessages?, visibilityTimeout?)` | Receives messages from the queue | `Promise<any>` |
-| `deleteMessage(queueName, messageId, popReceipt)` | Deletes a message from the queue | `Promise<void>` |
-| `peekMessages(queueName, maxMessages?)` | Peeks messages without removing them | `Promise<any>` |
-| `clearMessages(queueName)` | Clears all messages from the queue | `Promise<void>` |
-| `createQueue(queueName)` | Creates a queue if it doesn't exist | `Promise<void>` |
-| `deleteQueue(queueName)` | Deletes a queue | `Promise<void>` |
-| `queueExists(queueName)` | Checks if a queue exists | `Promise<boolean>` |
-| `getMessageCount(queueName)` | Gets approximate message count | `Promise<number>` |
+|---|---|---|
+| `getQueueClient(queueName)` | Gets a QueueClient | `QueueClient` |
+| `sendMessage(queue, message, base64Encode?)` | Sends a message | `Promise<QueueSendMessageResponse>` |
+| `receiveMessages(queue, maxMessages?, visibilityTimeout?)` | Receives messages | `Promise<any>` |
+| `deleteMessage(queue, messageId, popReceipt)` | Deletes a message | `Promise<void>` |
+| `peekMessages(queue, maxMessages?)` | Peeks messages without consuming | `Promise<any>` |
+| `clearMessages(queue)` | Clears all messages | `Promise<void>` |
+| `createQueue(queue)` | Creates a queue | `Promise<void>` |
+| `deleteQueue(queue)` | Deletes a queue | `Promise<void>` |
+| `queueExists(queue)` | Checks if a queue exists | `Promise<boolean>` |
+| `getMessageCount(queue)` | Gets approximate message count | `Promise<number>` |
 
-
-## License
-
-[MIT](https://github.com/akadenia/AkadeniaAzureStorage/blob/main/LICENSE)
+---
 
 ## Contributing
 
@@ -730,46 +538,29 @@ git clone https://github.com/akadenia/AkadeniaAzureStorage.git
 cd AkadeniaAzureStorage
 npm install
 npm run build
-npm test
+npm run test:with-azurite  # requires Azurite running locally
 ```
 
 ### Commit Message Guidelines
 
-We follow [Conventional Commits](https://www.conventionalcommits.org/) for our semantic release process. **We prefer commit messages to include a scope in parentheses** for better categorization and changelog generation.
+We follow [Conventional Commits](https://www.conventionalcommits.org/). Scope is required.
 
-### Preferred Format
-```
+```text
 type(scope): description
-
-[optional body]
-
-[optional footer]
 ```
 
-### Examples
-```bash
-## ✅ Preferred - with scope
-feat(blob): add new SAS URL generation options
-fix(table): resolve entity deletion issue
-docs(readme): add troubleshooting section
-chore(deps): update azure dependencies
+**Common scopes:** `blob` · `table` · `queue` · `docs` · `deps` · `test` · `build` · `ci`
 
-## ❌ Less preferred - without scope
-feat: add new SAS URL generation options
-fix: resolve entity deletion issue
-docs: add troubleshooting section
-chore: update azure dependencies
-```
+**Types:** `feat` · `fix` · `docs` · `style` · `refactor` · `test` · `chore`
 
-### Common Scopes
-- `blob` - Blob Storage functionality
-- `table` - Table Storage functionality
-- `queue` - Queue Storage functionality
-- `docs` - Documentation updates
-- `deps` - Dependency updates
-- `test` - Test-related changes
-- `build` - Build and build tooling
-- `ci` - CI/CD configuration
+## Requirements
+
+- Node.js >= 20
+- Azure Storage account (or Azurite for local development)
+
+## License
+
+[MIT](https://github.com/akadenia/AkadeniaAzureStorage/blob/main/LICENSE)
 
 ## Support
 
