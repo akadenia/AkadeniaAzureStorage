@@ -180,7 +180,7 @@ const containerSas = await blobStorage.generateSASUrl('my-container', undefined,
 });
 ```
 
-#### SAS Permissions
+### SAS Permissions
 
 ```typescript
 import { BlobPermissions } from '@akadenia/azure-storage';
@@ -380,7 +380,7 @@ const queueStorage = new QueueStorage("UseDevelopmentStorage=true");
 
 ### Managed Identity Authentication
 
-#### System-Assigned (Most Common)
+### System-Assigned (Most Common)
 
 Automatically created when you enable managed identity on your Azure resource — no client ID needed.
 
@@ -390,7 +390,7 @@ const tableStorage = new TableStorage({ accountName: 'yourstorageaccount', table
 const queueStorage = new QueueStorage({ accountName: 'yourstorageaccount' });
 ```
 
-#### User-Assigned
+### User-Assigned
 
 A standalone identity shared across multiple Azure resources. Requires the client ID.
 
@@ -401,7 +401,7 @@ const blobStorage = new BlobStorage({
 });
 ```
 
-#### Environment-Based Configuration
+### Environment-Based Configuration
 
 ```typescript
 const blobStorage = process.env.NODE_ENV === 'production'
