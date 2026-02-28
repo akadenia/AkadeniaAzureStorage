@@ -412,6 +412,7 @@ const blobStorage = process.env.NODE_ENV === 'production'
 > **Note:** When using Managed Identity, ensure your Azure resource has the appropriate role assignments:
 > - **Storage Blob Data Contributor** for Blob Storage
 > - **Storage Table Data Contributor** for Table Storage
+> - **Storage Queue Data Contributor** for Queue Storage
 
 ---
 
