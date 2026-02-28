@@ -50,17 +50,24 @@ You can authenticate using either:
 - **Connection String**: Get this from the Azure Portal under your storage account's "Access keys" section
 - **Managed Identity**: For applications running in Azure (recommended for production)
 
+**Option 1: Connection string**
+
 ```typescript
 import { BlobStorage, TableStorage, QueueStorage } from '@akadenia/azure-storage';
 
-// Option 1: Using connection string
 const connectionString = "DefaultEndpointsProtocol=https;AccountName=yourstorageaccount;AccountKey=yourkey;EndpointSuffix=core.windows.net";
-const blobStorage = new BlobStorage(connectionString);
+
+const blobStorage  = new BlobStorage(connectionString);
 const tableStorage = new TableStorage(connectionString, 'tableName');
 const queueStorage = new QueueStorage(connectionString);
+```
 
-// Option 2: Using managed identity (recommended for production)
-const blobStorage = new BlobStorage({ accountName: 'yourstorageaccount' });
+**Option 2: Managed Identity (recommended for production)**
+
+```typescript
+import { BlobStorage, TableStorage, QueueStorage } from '@akadenia/azure-storage';
+
+const blobStorage  = new BlobStorage({ accountName: 'yourstorageaccount' });
 const tableStorage = new TableStorage({ accountName: 'yourstorageaccount', tableName: 'tableName' });
 const queueStorage = new QueueStorage({ accountName: 'yourstorageaccount' });
 ```
