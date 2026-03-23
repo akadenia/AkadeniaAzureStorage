@@ -1,3 +1,63 @@
+# [2.0.0](https://github.com/akadenia/AkadeniaAzureStorage/compare/v1.2.3...v2.0.0) (2026-03-23)
+
+
+### Bug Fixes
+
+* **blob:** update generateSASUrl method to take expiresOn as a Date ([#33](https://github.com/akadenia/AkadeniaAzureStorage/issues/33)) ([394ec74](https://github.com/akadenia/AkadeniaAzureStorage/commit/394ec74f3859b3d12b31ce25c8d781531e63bf2f))
+* **ci:** correct prepare step for npm publish ([d04e613](https://github.com/akadenia/AkadeniaAzureStorage/commit/d04e613871dc034d2d5d929549f194c2f02ccdd6))
+* **circleci:** use jq for safe json and handle pr creation errors explicitly ([#69](https://github.com/akadenia/AkadeniaAzureStorage/issues/69)) ([4438282](https://github.com/akadenia/AkadeniaAzureStorage/commit/4438282392cef899c869bc825976e71a683e8636))
+* **circleci:** use node/install without args to auto-read .nvmrc ([#67](https://github.com/akadenia/AkadeniaAzureStorage/issues/67)) ([4eb9f82](https://github.com/akadenia/AkadeniaAzureStorage/commit/4eb9f8297ae441a9506cfef291c288aa89794bd8))
+* **dependabot:** bump fast-xml-parser from 4.4.0 to 4.4.1 ([#13](https://github.com/akadenia/AkadeniaAzureStorage/issues/13)) ([7d44e50](https://github.com/akadenia/AkadeniaAzureStorage/commit/7d44e50276fed195c76a8f3da177ee4410580535)), closes [#1](https://github.com/akadenia/AkadeniaAzureStorage/issues/1) [#4](https://github.com/akadenia/AkadeniaAzureStorage/issues/4) [#7](https://github.com/akadenia/AkadeniaAzureStorage/issues/7) [#8](https://github.com/akadenia/AkadeniaAzureStorage/issues/8)
+* **property-naming:** rename Timestamp property to timestamp ([9873a28](https://github.com/akadenia/AkadeniaAzureStorage/commit/9873a28da2edd5a780e710edf013c234c7c57849))
+* **readme:** untrack the readme.hbs file ([#22](https://github.com/akadenia/AkadeniaAzureStorage/issues/22)) ([831ce9a](https://github.com/akadenia/AkadeniaAzureStorage/commit/831ce9a0afa2effd833f559f8c93714f117c2e72))
+* release config update to npm plugin ([4e83b78](https://github.com/akadenia/AkadeniaAzureStorage/commit/4e83b78e60464b46cb812d56a62678c0ee700a21))
+* **sas-url:** prevent double slashes from sas url ([d5358a4](https://github.com/akadenia/AkadeniaAzureStorage/commit/d5358a45637f207ac11eaf4e76e98000c86f71b2))
+* **sas:** fix not detecting the container name from the sas url ([#28](https://github.com/akadenia/AkadeniaAzureStorage/issues/28)) ([3391880](https://github.com/akadenia/AkadeniaAzureStorage/commit/3391880e02b181576cc992aad07b8d39fcef0034))
+* **security:** potential fix for code scanning alert no. 7: Workflow does not contain permissions ([ff82ff6](https://github.com/akadenia/AkadeniaAzureStorage/commit/ff82ff6bec3635ddd6f9e94a70604b83243bbb84))
+* **security:** potential fix for code scanning alert no. 7: workflow does not contain permissions ([#46](https://github.com/akadenia/AkadeniaAzureStorage/issues/46)) ([1b38a0e](https://github.com/akadenia/AkadeniaAzureStorage/commit/1b38a0eece2da770d90945e649a4e3c220cede45))
+* **test,npm:** update homepage and fix table tests ([40f82eb](https://github.com/akadenia/AkadeniaAzureStorage/commit/40f82eb5135cc94b913a5cdbab98f4572c90b18d))
+
+
+### Features
+
+* **blob-storage:** add support for sas url ([#20](https://github.com/akadenia/AkadeniaAzureStorage/issues/20)) ([4c5b0bd](https://github.com/akadenia/AkadeniaAzureStorage/commit/4c5b0bde8277e594f027850e16eeec9f66f05735))
+* **blob,sas-url:** add create and delete container, fix blob sas url, add tests ([#26](https://github.com/akadenia/AkadeniaAzureStorage/issues/26)) ([1c47116](https://github.com/akadenia/AkadeniaAzureStorage/commit/1c47116ddc2b1e22bda48bdf8786041ce25961c9))
+* **blob:** add blob http headers for upload data and upload function ([#30](https://github.com/akadenia/AkadeniaAzureStorage/issues/30)) ([f4fec59](https://github.com/akadenia/AkadeniaAzureStorage/commit/f4fec59a087e566f58ece6c1e41a9c25e219907a))
+* **blob:** enhance generateSASUrl with async support and User Delegation SAS ([#53](https://github.com/akadenia/AkadeniaAzureStorage/issues/53)) ([c8076c3](https://github.com/akadenia/AkadeniaAzureStorage/commit/c8076c351bcb8c933660a27381eb81cc877ece57)), closes [hi#level](https://github.com/hi/issues/level)
+* **blob:** implement ability to delete a blob ([#37](https://github.com/akadenia/AkadeniaAzureStorage/issues/37)) ([f376176](https://github.com/akadenia/AkadeniaAzureStorage/commit/f376176310a7fc8231d506303beceefdc16b96f9))
+* **deps:** upgrade npm dependencies ([d3bbaa7](https://github.com/akadenia/AkadeniaAzureStorage/commit/d3bbaa7aaab3b95161cb82193dedb7a96983eff0))
+* **docs:** add generate docs script ([#15](https://github.com/akadenia/AkadeniaAzureStorage/issues/15)) ([ee2be5e](https://github.com/akadenia/AkadeniaAzureStorage/commit/ee2be5eab5d5b4a6bdc99e8769c60cbf2537e4f4)), closes [#13](https://github.com/akadenia/AkadeniaAzureStorage/issues/13) [#1](https://github.com/akadenia/AkadeniaAzureStorage/issues/1) [#4](https://github.com/akadenia/AkadeniaAzureStorage/issues/4) [#7](https://github.com/akadenia/AkadeniaAzureStorage/issues/7) [#8](https://github.com/akadenia/AkadeniaAzureStorage/issues/8)
+* **managed-identity:** add managed identity support for Azure Storage services ([0a958f0](https://github.com/akadenia/AkadeniaAzureStorage/commit/0a958f03c6bd167210e23c525867ef44bc01d568))
+* **managed-identity:** add managed identity support for Azure Storage services ([#49](https://github.com/akadenia/AkadeniaAzureStorage/issues/49)) ([9b22e53](https://github.com/akadenia/AkadeniaAzureStorage/commit/9b22e532775a9fd89a7dcf572791f465ae7ddb31)), closes [hi#level](https://github.com/hi/issues/level)
+* **queue:** add delete and receive queue messages ([a4bb0fb](https://github.com/akadenia/AkadeniaAzureStorage/commit/a4bb0fb70a809e050a9d912d063950b4086cd44b))
+* **queue:** expose more queue storage methods ([#51](https://github.com/akadenia/AkadeniaAzureStorage/issues/51)) ([8a29d36](https://github.com/akadenia/AkadeniaAzureStorage/commit/8a29d36b96049daee14bc4f2d5484185c6d1cc7c)), closes [hi#level](https://github.com/hi/issues/level)
+* **sas-url:** change the response structure of sas url generator ([#39](https://github.com/akadenia/AkadeniaAzureStorage/issues/39)) ([7ec3893](https://github.com/akadenia/AkadeniaAzureStorage/commit/7ec38931b1a911f1591d045061df9abf07488fd3))
+* **sas:** rework the logic around sas urls ([#35](https://github.com/akadenia/AkadeniaAzureStorage/issues/35)) ([e7f6f44](https://github.com/akadenia/AkadeniaAzureStorage/commit/e7f6f444067bb96dc8de15363e2088aec26ba6bf))
+* semantic release setup ([#7](https://github.com/akadenia/AkadeniaAzureStorage/issues/7)) ([1d1d10e](https://github.com/akadenia/AkadeniaAzureStorage/commit/1d1d10eb5308477b7daec46b4319cbeecbcdbefa))
+* **table-storage:** implement azure table support  ([#14](https://github.com/akadenia/AkadeniaAzureStorage/issues/14)) ([4fc44f9](https://github.com/akadenia/AkadeniaAzureStorage/commit/4fc44f9b2c9603d82abe41be9213c94636f8e959))
+
+
+### BREAKING CHANGES
+
+* **blob:** Sas option `expires: number` was replaced by `expiresOn: Date`
+
+<!-- This is an auto-generated comment: release notes by coderabbit.ai
+-->
+
+## Summary by CodeRabbit
+
+- **New Features**
+- Updated SAS (Shared Access Signature) token generation to use explicit
+date-based expiration
+- Improved handling of token expiration times with more precise `Date`
+object support
+
+- **Bug Fixes**
+- Refined SAS URL generation to provide clearer expiration time
+management
+
+<!-- end of auto-generated comment: release notes by coderabbit.ai -->
+
 # [2.6.0](https://github.com/akadenia/AkadeniaAzureStorage/compare/2.5.0...2.6.0) (2025-12-15)
 
 
