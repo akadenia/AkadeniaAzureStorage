@@ -64,7 +64,8 @@
     "ts-jest": "^29.4.6",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
-    "wait-on": "^9.0.3"
+    "wait-on": "^9.0.3",
+    "@semantic-release/git": "^10.0.1"
   },
   "engines": {
     "node": ">=20.x"
