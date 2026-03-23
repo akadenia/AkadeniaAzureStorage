@@ -40,16 +40,16 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
-    "@azure/data-tables": "^13.2.2",
-    "@azure/identity": "^4.13.0",
+    "@azure/data-tables": "^13.3.2",
+    "@azure/identity": "^4.13.1",
     "@azure/logger": "^1.3.0",
-    "@azure/storage-blob": "^12.29.1",
-    "@azure/storage-queue": "^12.28.1"
+    "@azure/storage-blob": "^12.31.0",
+    "@azure/storage-queue": "^12.29.0"
   },
   "devDependencies": {
-    "@commitlint/cli": "^20.2.0",
-    "@commitlint/config-conventional": "^20.2.0",
-    "@jest/globals": "^30.2.0",
+    "@commitlint/cli": "^20.5.0",
+    "@commitlint/config-conventional": "^20.5.0",
+    "@jest/globals": "^30.3.0",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/commit-analyzer": "^13.0.0",
     "@semantic-release/exec": "^7.1.0",
@@ -58,18 +58,18 @@
     "@semantic-release/npm": "^12.0.0",
     "@semantic-release/release-notes-generator": "^14.0.0",
     "@types/jsdoc-to-markdown": "^7.0.6",
-    "@types/node": "^24.12.0",
+    "@types/node": "^25.5.0",
     "azurite": "^3.35.0",
     "concurrently": "^9.2.1",
     "husky": "^9.1.7",
-    "jest": "^30.2.0",
+    "jest": "^30.3.0",
     "jsdoc-to-markdown": "^9.1.3",
-    "prettier": "^3.7.4",
-    "semantic-release": "^25.0.2",
+    "prettier": "^3.8.1",
+    "semantic-release": "^25.0.3",
     "ts-jest": "^29.4.6",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
-    "wait-on": "^9.0.3"
+    "wait-on": "^9.0.4"
   },
   "engines": {
     "node": ">=20.x"
