@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/akadenia/AkadeniaAzureStorage/compare/v2.0.0...v2.0.1) (2026-03-25)
+
+
+### Bug Fixes
+
+* **release:** replace @semantic-release/git with PR-based release asset workflow ([#87](https://github.com/akadenia/AkadeniaAzureStorage/issues/87)) ([e1978b2](https://github.com/akadenia/AkadeniaAzureStorage/commit/e1978b23177fd541177a055935dccf59cea95dc8))
+
 # [2.0.0](https://github.com/akadenia/AkadeniaAzureStorage/compare/v1.2.3...v2.0.0) (2026-03-23)
 
 
