@@ -1,8 +1,6 @@
 {
   "compilerOptions": {
-    "ignoreDeprecations": "6.0",
     "baseUrl": ".",
-    "rootDir": ".",
     "target": "ES2015",
     "module": "commonjs",
     "strict": true,
