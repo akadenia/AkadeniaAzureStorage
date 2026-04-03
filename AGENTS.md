@@ -64,6 +64,12 @@ Do not manually bump versions in `package.json`.
 - Keep TypeScript at `^5.x` — **do not upgrade to TypeScript 6.x** until `ts-jest` adds support
 - Build with `npm run build` (compiles to `dist/`)
 
+## README / Documentation
+
+- **Maximum heading depth is h3 (`###`)** — never use `####` or deeper in README.md
+- The README is mirrored as MDX on akadenia.com, which only supports h1–h3. h4+ headings break the MDX parser and the website build.
+- Use **bold text** instead of h4 for sub-sections under h3.
+
 ## Testing
 
 - Tests live in `__tests__/`, run with `jest`
