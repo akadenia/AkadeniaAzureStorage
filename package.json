@@ -20,7 +20,7 @@
     "lint": "prettier --check \"./**/*.{ts,tsx,js,jsx,json,yml}\" && tsc --noEmit",
     "prepare": "husky",
     "version": "git add -A src",
-    "updateLink": "npm run build && npm rm @akadenia/azure-storage -g && npm link",
+    "updateLink": "pnpm run build && pnpm rm @akadenia/azure-storage -g && pnpm link",
     "generate:docs": "ts-node generate-docs.ts"
   },
   "files": [

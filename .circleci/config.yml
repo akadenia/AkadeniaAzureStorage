@@ -14,13 +14,14 @@ jobs:
       - checkout
       - node/install:
           node-version: << parameters.node-version >>
+          install-pnpm: true
       - node/install-packages:
-          pkg-manager: npm
-      - run: npm run build
-      - run: npm run lint
+          pkg-manager: pnpm
+      - run: pnpm run build
+      - run: pnpm run lint
       - run:
           name: Run tests with Azurite
-          command: npm run test:with-azurite
+          command: pnpm run test:with-azurite
 
   build_lint_test:
     docker:
@@ -37,10 +38,11 @@ jobs:
     steps:
       - checkout
       - node/install:
-          node-version: "22"
+          node-version: "26"
+          install-pnpm: true
       - node/install-packages:
-          pkg-manager: npm
-      - run: npm run build
+          pkg-manager: pnpm
+      - run: pnpm run build
       - run:
           name: Semantic Release
           command: npx semantic-release
@@ -75,7 +77,7 @@ workflows:
       - build_lint_test_node:
           matrix:
             parameters:
-              node-version: ["20", "22", "24"]
+              node-version: ["22", "24", "26"]
       - build_lint_test:
           requires:
             - build_lint_test_node
