@@ -1,3 +1,15 @@
+# [2.1.0](https://github.com/akadenia/AkadeniaAzureStorage/compare/v2.0.1...v2.1.0) (2026-06-26)
+
+
+### Bug Fixes
+
+* migrate to pnpm, align CI, and add Node 26 ([#99](https://github.com/akadenia/AkadeniaAzureStorage/issues/99)) ([0565f68](https://github.com/akadenia/AkadeniaAzureStorage/commit/0565f68e233c9e42c2f4119a3ae40f31435cca3e)), closes [#98](https://github.com/akadenia/AkadeniaAzureStorage/issues/98)
+
+
+### Features
+
+* **ci:** make PR title scope optional in linter ([#96](https://github.com/akadenia/AkadeniaAzureStorage/issues/96)) ([4a08fb5](https://github.com/akadenia/AkadeniaAzureStorage/commit/4a08fb58ee520d04e7262be8e5a2694e10527cda))
+
 ## [2.0.1](https://github.com/akadenia/AkadeniaAzureStorage/compare/v2.0.0...v2.0.1) (2026-03-25)
 
 
