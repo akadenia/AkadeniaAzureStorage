@@ -536,9 +536,9 @@ We welcome contributions! Please feel free to submit a Pull Request.
 ```bash
 git clone https://github.com/akadenia/AkadeniaAzureStorage.git
 cd AkadeniaAzureStorage
-npm install
-npm run build
-npm run test:with-azurite  # requires Azurite running locally
+pnpm install
+pnpm run build
+pnpm test:with-azurite  # requires Azurite running locally
 ```
 
 ### Commit Message Guidelines
