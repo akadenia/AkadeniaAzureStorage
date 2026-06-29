@@ -1,3 +1,10 @@
+## [2.7.1](https://github.com/akadenia/AkadeniaAzureStorage/compare/2.7.0...2.7.1) (2026-06-29)
+
+
+### Bug Fixes
+
+* update dependencies and resolve security vulnerabilities ([#101](https://github.com/akadenia/AkadeniaAzureStorage/issues/101)) ([693fffd](https://github.com/akadenia/AkadeniaAzureStorage/commit/693fffd08d2bf46a41548c3bf20b7db800ae5802))
+
 # [2.7.0](https://github.com/akadenia/AkadeniaAzureStorage/compare/2.6.1...2.7.0) (2026-06-27)
 
 
