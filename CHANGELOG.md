@@ -1,3 +1,10 @@
+## [2.7.2](https://github.com/akadenia/AkadeniaAzureStorage/compare/2.7.1...2.7.2) (2026-07-20)
+
+
+### Bug Fixes
+
+* update azurite to resolve security vulnerabilities ([#103](https://github.com/akadenia/AkadeniaAzureStorage/issues/103)) ([7f1995d](https://github.com/akadenia/AkadeniaAzureStorage/commit/7f1995db6569566570b6b39b62d1951bf0e182bb)), closes [tou#cookie](https://github.com/tou/issues/cookie)
+
 ## [2.7.1](https://github.com/akadenia/AkadeniaAzureStorage/compare/2.7.0...2.7.1) (2026-06-29)
 
 
