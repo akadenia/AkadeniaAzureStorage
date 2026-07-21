@@ -32,3 +32,28 @@ git commit -m "chore(release): add release assets from $VERSION"
 git remote set-url origin "https://${GH_TOKEN}@github.com/akadenia/AkadeniaAzureStorage.git"
 git push origin $BRANCH_NAME
 
+# Open PR
+PAYLOAD=$(jq -n \
+  --arg title "chore(release): merge release ${VERSION} assets" \
+  --arg head "$BRANCH_NAME" \
+  --arg base "main" \
+  --arg body "Merge release ${VERSION} assets" \
+  '{title: $title, head: $head, base: $base, body: $body}')
+
+RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
+  -H "Authorization: Bearer ${GH_TOKEN}" \
+  -H "Accept: application/vnd.github+json" \
+  "https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/pulls" \
+  -d "$PAYLOAD")
+
+HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+BODY=$(echo "$RESPONSE" | head -n -1)
+
+if [ "$HTTP_CODE" = "201" ]; then
+  echo "Release PR created successfully."
+elif [ "$HTTP_CODE" = "422" ] && echo "$BODY" | grep -qi "pull request already exists"; then
+  echo "Release PR already exists — skipping."
+else
+  echo "PR creation failed (HTTP $HTTP_CODE): $BODY"
+  exit 1
+fi
