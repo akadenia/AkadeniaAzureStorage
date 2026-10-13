@@ -15,9 +15,11 @@ import { DefaultAzureCredential } from "@azure/identity"
     Control characters from U+007F to U+009F
 
     The partition key and row key may be a string value up to 1024 characters in size.
+
+    The timestamp is an ISO 8601 string, as returned by @azure/data-tables. Use new Date(timestamp) to get a Date.
  */
 export interface ITableEntity extends TableEntity {
-  readonly timestamp?: Date
+  readonly timestamp?: string
   [key: string]: any
 }
 
