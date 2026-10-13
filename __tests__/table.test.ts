@@ -87,6 +87,24 @@ describe("TableStorage", () => {
     await table.deleteTable()
   })
 
+  it("should return the timestamp as an ISO 8601 string", async () => {
+    const table = new TableStorage(storageConnectionString, "TestTableTimestamp")
+    await table.createTable()
+
+    try {
+      await table.insert({ partitionKey: "p1", rowKey: "1", name: "name1" })
+
+      const [listed] = await table.list()
+      const fetched = await table.get("p1", "1")
+
+      expect(typeof listed.timestamp).toBe("string")
+      expect(Number.isNaN(Date.parse(listed.timestamp!))).toBe(false)
+      expect(typeof fetched.timestamp).toBe("string")
+    } finally {
+      await table.deleteTable()
+    }
+  })
+
   it("should delete an entity", async () => {
     const table = new TableStorage(storageConnectionString, "TestTableDelete")
     await table.createTable()
